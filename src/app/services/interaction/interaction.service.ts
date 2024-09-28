@@ -15,7 +15,9 @@ export class InteractionService {
     window.addEventListener('mousemove', (event) => this.onMouseMove(event));
     window.addEventListener('keydown', (event) => this.onKeyDown(event));
     window.addEventListener('keyup', (event) => this.onKeyUp(event));
-    window.addEventListener('wheel', (event) => this.onWheel(event));
+    window.addEventListener('wheel', (event) => this.onWheel(event), {
+      passive: false,
+    });
   }
 
   addMouseInteractable(interactable: IMouseInteractable): void {
