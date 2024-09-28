@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ISceneObject } from '../objects/scene-object';
+import { ISceneObject } from '../../interfaces/scene-object';
 
 @Injectable({
   providedIn: 'root',

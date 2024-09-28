@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ThreeService } from './services/three.service';
+import { ThreeService } from './services/rendering/three.service';
 
 @Component({
   selector: 'app-root',

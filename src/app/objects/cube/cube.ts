@@ -1,6 +1,6 @@
 import { Guid } from 'guid-typescript';
 import { Group } from 'three';
-import { ISceneObject } from '../scene-object';
+import { ISceneObject } from '../../interfaces/scene-object';
 import * as THREE from 'three';
 
 export class Cube implements ISceneObject {
@@ -8,7 +8,7 @@ export class Cube implements ISceneObject {
   group: Group;
   existsInScene: boolean = false;
 
-  constructor() {
+  constructor(positionX: number, positionY: number, positionZ: number) {
     this.id = Guid.create();
 
     const geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -26,6 +26,9 @@ export class Cube implements ISceneObject {
     var wireframe = new THREE.LineSegments(geo, mat);
     cube.add(wireframe);
 
+    cube.position.x = positionX;
+    cube.position.y = positionY;
+    cube.position.z = positionZ;
     this.group = new Group();
     this.group.add(cube);
   }

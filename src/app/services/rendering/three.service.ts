@@ -1,16 +1,12 @@
 import { Injectable } from '@angular/core';
-import * as THREE from 'three';
 import { throttle } from 'lodash-es';
-import {
-  FARCLIPPINGPLANE,
-  FOV,
-  FPS,
-  NEARCLIPPINGPLANE,
-  DEFAULTBACKGROUND,
-} from '../constants';
+import * as THREE from 'three';
+import { DEFAULTBACKGROUND, DEFAULTCAMERAPOSITION, FPS } from '../../constants';
+import { ISceneObject } from '../../interfaces/scene-object';
+import { Cube } from '../../objects/cube/cube';
+import { InteractionService } from '../interaction/interaction.service';
+import { CameraService } from './camera.service';
 import { ObjectTrackerService } from './object-tracker.service';
-import { ISceneObject } from '../objects/scene-object';
-import { Cube } from '../objects/cube/cube';
 
 @Injectable({
   providedIn: 'root',
@@ -18,33 +14,33 @@ import { Cube } from '../objects/cube/cube';
 export class ThreeService {
   private lastRenderTime: number = new Date().getTime();
   private scene: THREE.Scene;
-  private camera: THREE.PerspectiveCamera;
 
-  constructor(private readonly objectTrackerService: ObjectTrackerService) {
+  constructor(
+    private readonly objectTrackerService: ObjectTrackerService,
+    private readonly cameraService: CameraService,
+    private readonly interactionService: InteractionService
+  ) {
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(
-      FOV,
-      window.innerWidth / window.innerHeight,
-      NEARCLIPPINGPLANE,
-      FARCLIPPINGPLANE
-    );
   }
 
   createThreeJsBox(): void {
+    this.interactionService.addInteractable(this.cameraService);
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    this.addObjectToScene(new Cube());
+    this.addObjectToScene(new Cube(0, -2, 0));
+    this.addObjectToScene(new Cube(1, 1, 2));
+    this.addObjectToScene(new Cube(-4, 0, 1));
 
-    this.camera.position.z = 5;
+    this.cameraService.updatePosition(DEFAULTCAMERAPOSITION);
 
     const animate = () => {
       const currentTime = new Date().getTime();
       if (currentTime - this.lastRenderTime > 1000 / FPS) {
         this.lastRenderTime += 1000 / FPS;
         this.updateObjects();
-        renderer.render(this.scene, this.camera);
+        renderer.render(this.scene, this.cameraService.getCamera());
       }
     };
 
@@ -55,8 +51,7 @@ export class ThreeService {
       'resize',
       throttle(
         () => {
-          this.camera.aspect = window.innerWidth / window.innerHeight;
-          this.camera.updateProjectionMatrix();
+          this.cameraService.rescale(window.innerWidth / window.innerHeight);
           renderer.setSize(window.innerWidth, window.innerHeight);
         },
         1000 / FPS,
