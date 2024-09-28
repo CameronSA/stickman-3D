@@ -3,7 +3,7 @@ import { throttle } from 'lodash-es';
 import * as THREE from 'three';
 import { DEFAULTBACKGROUND, DEFAULTCAMERAPOSITION, FPS } from '../../constants';
 import { ISceneObject } from '../../interfaces/scene-object';
-import { Cube } from '../../objects/cube/cube';
+import { Cube } from '../../objects/cube';
 import { InteractionService } from '../interaction/interaction.service';
 import { CameraService } from './camera.service';
 import { ObjectTrackerService } from './object-tracker.service';

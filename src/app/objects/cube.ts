@@ -1,7 +1,7 @@
 import { Guid } from 'guid-typescript';
-import { Group } from 'three';
-import { ISceneObject } from '../../interfaces/scene-object';
 import * as THREE from 'three';
+import { Group } from 'three';
+import { ISceneObject } from '../interfaces/scene-object';
 
 export class Cube implements ISceneObject {
   id: Guid;
