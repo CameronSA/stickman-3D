@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { throttle } from 'lodash-es';
 import * as THREE from 'three';
-import { DEFAULTBACKGROUND, DEFAULTCAMERAPOSITION, FPS } from '../../constants';
+import { DEFAULTBACKGROUND, FPS } from '../../constants';
 import { ISceneObject } from '../../interfaces/scene-object';
 import { Cube } from '../../objects/cube';
+import { Grid } from '../../objects/grid';
+import { Light } from '../../objects/light';
 import { InteractionService } from '../interaction/interaction.service';
 import { CameraService } from './camera.service';
 import { ObjectTrackerService } from './object-tracker.service';
@@ -27,14 +29,15 @@ export class ThreeService {
     this.interactionService.addInteractable(this.cameraService);
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(devicePixelRatio);
     document.body.appendChild(renderer.domElement);
 
+    this.addObjectToScene(new Light());
+    this.addObjectToScene(new Grid(10, 20));
     this.addObjectToScene(new Cube(0, -2, 0));
     this.addObjectToScene(new Cube(1, 1, 2));
     this.addObjectToScene(new Cube(-4, 0, 1));
-
-    this.cameraService.updatePosition(DEFAULTCAMERAPOSITION);
-
+    this.addObjectToScene(this.cameraService.getCameraBoom());
     const animate = () => {
       const currentTime = new Date().getTime();
       if (currentTime - this.lastRenderTime > 1000 / FPS) {

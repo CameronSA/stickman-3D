@@ -1,8 +1,22 @@
 import { Injectable } from '@angular/core';
 import * as THREE from 'three';
-import { FARCLIPPINGPLANE, FOV, NEARCLIPPINGPLANE } from '../../constants';
+import {
+  DEFAULTCAMERAPOSITION,
+  DEFAULTMOUSESENSITIVITY,
+  FARCLIPPINGPLANE,
+  FOV,
+  NEARCLIPPINGPLANE,
+} from '../../constants';
 import { IKeyboardInteractable } from '../../interfaces/keyboard-interactable';
 import { IMouseInteractable } from '../../interfaces/mouse-interactable';
+import { ISceneObject } from '../../interfaces/scene-object';
+import { CameraBoom } from '../../objects/camera-boom';
+
+enum MouseButton {
+  Left,
+  Middle,
+  Right,
+}
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +25,11 @@ export class CameraService
   implements IMouseInteractable, IKeyboardInteractable
 {
   private readonly camera: THREE.PerspectiveCamera;
+  private readonly cameraBoom: ISceneObject;
+  private mouseDown = false;
+  private shiftPressed = false;
+  private controlPressed = false;
+  private mouseButton: MouseButton = MouseButton.Left;
 
   constructor() {
     this.camera = new THREE.PerspectiveCamera(
@@ -19,17 +38,69 @@ export class CameraService
       NEARCLIPPINGPLANE,
       FARCLIPPINGPLANE
     );
+
+    this.cameraBoom = new CameraBoom(0, 0, 0);
+    this.cameraBoom.group.add(this.camera);
+    this.camera.position.set(
+      DEFAULTCAMERAPOSITION.x,
+      DEFAULTCAMERAPOSITION.y,
+      DEFAULTCAMERAPOSITION.z
+    );
+
+    this.camera.lookAt(0, 0, 0);
   }
 
-  onKeyDown(event: KeyboardEvent): void {}
+  getCameraBoom(): CameraBoom {
+    return this.cameraBoom;
+  }
 
-  onKeyUp(event: KeyboardEvent): void {}
+  onKeyDown(event: KeyboardEvent): void {
+    if (event.key === 'Shift') {
+      this.shiftPressed = true;
+    } else if (event.key === 'Control') {
+      this.controlPressed = true;
+    }
+  }
 
-  onMouseDown(event: MouseEvent): void {}
+  onKeyUp(event: KeyboardEvent): void {
+    if (event.key === 'Shift') {
+      this.shiftPressed = false;
+    } else if (event.key === 'Control') {
+      this.controlPressed = true;
+    }
+  }
 
-  onMouseUp(event: MouseEvent): void {}
+  onMouseDown(event: MouseEvent): void {
+    this.mouseDown = true;
+    this.mouseButton = event.button;
+  }
 
-  onMouseMove(event: MouseEvent): void {}
+  onMouseUp(event: MouseEvent): void {
+    this.mouseDown = false;
+    this.shiftPressed = false;
+    this.controlPressed = false;
+  }
+
+  onMouseMove(event: MouseEvent): void {
+    if (!this.mouseDown) {
+      return;
+    }
+
+    if (this.mouseButton === MouseButton.Left) {
+      if (this.shiftPressed) {
+        this.cameraBoom.group.rotation.y -=
+          event.movementX * DEFAULTMOUSESENSITIVITY;
+        this.camera.lookAt(0, 0, 0);
+      } else if (this.controlPressed) {
+        this.cameraBoom.group.rotation.x +=
+          event.movementY * DEFAULTMOUSESENSITIVITY;
+        this.camera.lookAt(0, 0, 0);
+      } else {
+        this.camera.position.y += event.movementY * DEFAULTMOUSESENSITIVITY;
+        this.camera.position.x -= event.movementX * DEFAULTMOUSESENSITIVITY;
+      }
+    }
+  }
 
   onWheel(event: WheelEvent): void {
     let cameraDirection = new THREE.Vector3();

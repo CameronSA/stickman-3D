@@ -1,19 +1,18 @@
 import { Guid } from 'guid-typescript';
 import * as THREE from 'three';
-import { Group } from 'three';
 import { ISceneObject } from '../interfaces/scene-object';
 
 export class Cube implements ISceneObject {
   id: Guid;
-  group: Group;
+  group: THREE.Group;
   existsInScene: boolean = false;
 
   constructor(positionX: number, positionY: number, positionZ: number) {
     this.id = Guid.create();
 
     const geometry = new THREE.BoxGeometry(1, 1, 1);
-    const material = new THREE.MeshBasicMaterial({
-      color: 0x00ff00,
+    const material = new THREE.MeshLambertMaterial({
+      color: new THREE.Color(0xaaffff).multiplyScalar(0.5),
       polygonOffset: true,
       polygonOffsetFactor: 1,
       polygonOffsetUnits: 1,
@@ -21,7 +20,7 @@ export class Cube implements ISceneObject {
 
     const cube = new THREE.Mesh(geometry, material);
 
-    var geo = new THREE.EdgesGeometry(cube.geometry); // or WireframeGeometry
+    var geo = new THREE.EdgesGeometry(cube.geometry); // or
     var mat = new THREE.LineBasicMaterial({ color: 0x000000 });
     var wireframe = new THREE.LineSegments(geo, mat);
     cube.add(wireframe);
@@ -29,7 +28,7 @@ export class Cube implements ISceneObject {
     cube.position.x = positionX;
     cube.position.y = positionY;
     cube.position.z = positionZ;
-    this.group = new Group();
+    this.group = new THREE.Group();
     this.group.add(cube);
   }
 
