@@ -1,0 +1,20 @@
+.container {
+  display: flex;
+  position: absolute;
+  flex-direction: column;
+}
+
+$topbar-height: 10dvh;
+$sidebar-width: 20dvh;
+$bar-border: 0.1rem;
+.topbar-container {
+  width: calc(100dvw - 2 * $bar-border);
+  height: calc($topbar-height - 2 * $bar-border);
+  border: $bar-border solid black;
+}
+
+.sidebar-container {
+  width: calc($sidebar-width - 2 * $bar-border);
+  height: calc(100dvh - $topbar-height - 2 * $bar-border);
+  border: $bar-border solid black;
+}
