@@ -1,0 +1,41 @@
+import { Guid } from 'guid-typescript';
+import { Group } from 'three';
+import { ISceneObject } from '../scene-object';
+import * as THREE from 'three';
+
+export class Cube implements ISceneObject {
+  id: Guid;
+  group: Group;
+  existsInScene: boolean = false;
+
+  constructor() {
+    this.id = Guid.create();
+
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshBasicMaterial({
+      color: 0x00ff00,
+      polygonOffset: true,
+      polygonOffsetFactor: 1,
+      polygonOffsetUnits: 1,
+    });
+
+    const cube = new THREE.Mesh(geometry, material);
+
+    var geo = new THREE.EdgesGeometry(cube.geometry); // or WireframeGeometry
+    var mat = new THREE.LineBasicMaterial({ color: 0x000000 });
+    var wireframe = new THREE.LineSegments(geo, mat);
+    cube.add(wireframe);
+
+    this.group = new Group();
+    this.group.add(cube);
+  }
+
+  update() {
+    for (let child of this.group.children) {
+      if (child instanceof THREE.Mesh) {
+        child.rotation.x += 0.01;
+        child.rotation.y += 0.01;
+      }
+    }
+  }
+}
