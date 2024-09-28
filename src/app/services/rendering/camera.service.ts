@@ -82,20 +82,28 @@ export class CameraService
   }
 
   onMouseMove(event: MouseEvent): void {
+    // TODO: use spherical coordinates
     if (!this.mouseDown) {
       return;
     }
 
-    if (this.mouseButton === MouseButton.Left) {
-      if (this.shiftPressed) {
+    if (
+      this.mouseButton === MouseButton.Left ||
+      this.mouseButton === MouseButton.Middle
+    ) {
+      if (this.shiftPressed || this.mouseButton === MouseButton.Middle) {
         this.cameraBoom.group.rotation.y -=
           event.movementX * DEFAULTMOUSESENSITIVITY;
         this.camera.lookAt(0, 0, 0);
-      } else if (this.controlPressed) {
+      }
+
+      if (this.controlPressed || this.mouseButton === MouseButton.Middle) {
         this.cameraBoom.group.rotation.x +=
           event.movementY * DEFAULTMOUSESENSITIVITY;
         this.camera.lookAt(0, 0, 0);
-      } else {
+      }
+
+      if (!this.controlPressed && !this.shiftPressed) {
         this.camera.position.y += event.movementY * DEFAULTMOUSESENSITIVITY;
         this.camera.position.x -= event.movementX * DEFAULTMOUSESENSITIVITY;
       }
