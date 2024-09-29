@@ -44,6 +44,7 @@ export class ThreeService {
         this.lastRenderTime += 1000 / FPS;
         this.updateObjects();
         renderer.render(this.scene, this.cameraService.getCamera());
+        this.cameraService.updatePositionIfMoving();
       }
     };
 
@@ -87,8 +88,34 @@ export class ThreeService {
 
   removeObjectFromScene(sceneObject: ISceneObject) {
     this.objectTrackerService.deleteObject(sceneObject);
+
+    this.deleteChildren(sceneObject.group);
+
     this.scene.remove(sceneObject.group);
     sceneObject.existsInScene = false;
+  }
+
+  removeObjectsFromScene(sceneObjects: ISceneObject[]) {
+    for (let sceneObject of sceneObjects) {
+      this.removeObjectFromScene(sceneObject);
+    }
+  }
+
+  private deleteChildren(parent: THREE.Object3D): void {
+    if (parent.children.length === 0) {
+      return;
+    }
+
+    for (let child of parent.children) {
+      if (child.children.length > 0) {
+        this.deleteChildren(child);
+      } else {
+        if (child instanceof THREE.Mesh) {
+          let mesh = child as THREE.Mesh;
+          mesh.geometry.dispose();
+        }
+      }
+    }
   }
 
   private objectIsTracked(sceneObject: ISceneObject): boolean {

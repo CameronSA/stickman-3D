@@ -33,8 +33,9 @@ export class Cube implements ISceneObject {
   update() {
     for (let child of this.group.children) {
       if (child instanceof THREE.Mesh) {
-        child.rotation.x += 0.01;
-        child.rotation.y += 0.01;
+        let random = Math.random() / 10;
+        child.rotation.x += random;
+        child.rotation.y += random;
       }
     }
   }

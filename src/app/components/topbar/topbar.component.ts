@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Cube } from '../../objects/cube';
 import { Grid } from '../../objects/grid';
 import { Origin } from '../../objects/origin';
+import { CameraService } from '../../services/rendering/camera.service';
 import { ThreeService } from '../../services/rendering/three.service';
 
 @Component({
@@ -14,10 +16,15 @@ import { ThreeService } from '../../services/rendering/three.service';
 })
 export class TopbarComponent {
   private gridVisible: boolean = false;
+  private cubesVisible: boolean = false;
   private origin: Origin | undefined = undefined;
   private grid: Grid | undefined = undefined;
+  private cubes: Cube[] = [];
 
-  constructor(private readonly threeService: ThreeService) {}
+  constructor(
+    private readonly threeService: ThreeService,
+    private readonly cameraService: CameraService
+  ) {}
 
   onToggleGridClick() {
     this.gridVisible = !this.gridVisible;
@@ -37,5 +44,29 @@ export class TopbarComponent {
       this.threeService.removeObjectFromScene(this.origin);
       this.threeService.removeObjectFromScene(this.grid);
     }
+  }
+
+  onToggleCubesClick() {
+    this.cubesVisible = !this.cubesVisible;
+
+    function random() {
+      return Math.floor(Math.random() * 100) - 50;
+    }
+
+    if (this.cubes.length === 0) {
+      for (let i = 0; i < 1000; i++) {
+        this.cubes.push(new Cube(random(), Math.abs(random()) + 1, random()));
+      }
+    }
+
+    if (this.cubesVisible) {
+      this.threeService.addObjectsToScene(this.cubes);
+    } else {
+      this.threeService.removeObjectsFromScene(this.cubes);
+    }
+  }
+
+  onResetCameraClick() {
+    this.cameraService.reset();
   }
 }

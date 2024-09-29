@@ -14,7 +14,6 @@ export class ObjectTrackerService {
   public deleteObject(sceneObject: ISceneObject): void {
     for (let i = this.sceneObjects.length - 1; i >= 0; i--) {
       if (this.sceneObjects[i].id.equals(sceneObject.id)) {
-        // TODO: check that the object is actually gone from memory
         this.sceneObjects[i].group.remove();
         this.sceneObjects.splice(i, 1);
       }

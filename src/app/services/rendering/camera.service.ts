@@ -31,6 +31,8 @@ export class CameraService
   private shiftPressed = false;
   private controlPressed = false;
   private mouseButton: MouseButton = MouseButton.Left;
+  private resetActive = false;
+  private resetMovementFrameCount = 0;
 
   constructor() {
     this.camera = new THREE.PerspectiveCamera(
@@ -77,7 +79,7 @@ export class CameraService
   }
 
   onMouseMove(event: MouseEvent): void {
-    if (!this.mouseDown) {
+    if (!this.mouseDown || this.resetActive) {
       return;
     }
 
@@ -123,6 +125,10 @@ export class CameraService
   }
 
   onWheel(event: WheelEvent): void {
+    if (this.resetActive) {
+      return;
+    }
+
     let cameraDirection = new THREE.Vector3();
     this.camera.getWorldDirection(cameraDirection);
 
@@ -147,5 +153,53 @@ export class CameraService
   rescale(aspectRatio: number) {
     this.camera.aspect = aspectRatio;
     this.camera.updateProjectionMatrix();
+  }
+
+  reset() {
+    this.resetActive = true;
+  }
+
+  updatePositionIfMoving() {
+    if (!this.resetActive) {
+      return;
+    }
+
+    const positionDiffX = this.camera.position.x - DEFAULTCAMERAPOSITION.x;
+    const positionDiffY = this.camera.position.y - DEFAULTCAMERAPOSITION.y;
+    const positionDiffZ = this.camera.position.z - DEFAULTCAMERAPOSITION.z;
+
+    const distanceFactor = Math.sqrt(
+      positionDiffX * positionDiffX +
+        positionDiffY * positionDiffY +
+        positionDiffZ * positionDiffZ
+    );
+
+    let desiredResetFrames = Math.floor(distanceFactor * 5);
+    if (this.resetMovementFrameCount >= desiredResetFrames) {
+      this.camera.position.set(
+        DEFAULTCAMERAPOSITION.x,
+        DEFAULTCAMERAPOSITION.y,
+        DEFAULTCAMERAPOSITION.z
+      );
+
+      this.camera.lookAt(0, 0, 0);
+      this.resetMovementFrameCount = 0;
+      this.resetActive = false;
+      return;
+    }
+
+    const reductionFactor = desiredResetFrames / this.resetMovementFrameCount;
+
+    const distanceToMoveX = positionDiffX / reductionFactor;
+    const distanceToMoveY = positionDiffY / reductionFactor;
+    const distanceToMoveZ = positionDiffZ / reductionFactor;
+
+    this.camera.position.x -= distanceToMoveX;
+    this.camera.position.y -= distanceToMoveY;
+    this.camera.position.z -= distanceToMoveZ;
+
+    this.camera.lookAt(0, 0, 0);
+
+    this.resetMovementFrameCount++;
   }
 }
