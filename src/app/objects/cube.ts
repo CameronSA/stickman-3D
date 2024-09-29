@@ -1,15 +1,11 @@
-import { Guid } from 'guid-typescript';
 import * as THREE from 'three';
 import { ISceneObject } from '../interfaces/scene-object';
 
 export class Cube implements ISceneObject {
-  id: Guid;
   group: THREE.Group;
   existsInScene: boolean = false;
 
   constructor(positionX: number, positionY: number, positionZ: number) {
-    this.id = Guid.create();
-
     const geometry = new THREE.BoxGeometry(1, 1, 1);
     const material = new THREE.MeshLambertMaterial({
       color: new THREE.Color(0xaaffff).multiplyScalar(0.5),

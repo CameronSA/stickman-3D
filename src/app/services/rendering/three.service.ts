@@ -1,11 +1,16 @@
 import { Injectable } from '@angular/core';
 import { throttle } from 'lodash-es';
 import * as THREE from 'three';
-import { DEFAULTBACKGROUND, FPS } from '../../constants';
+import {
+  DEFAULTBACKGROUND,
+  DEFAULTFOG,
+  DEFAULTWORLDSIZE,
+  FPS,
+} from '../../constants';
 import { ISceneObject } from '../../interfaces/scene-object';
-import { Cube } from '../../objects/cube';
 import { Grid } from '../../objects/grid';
 import { Light } from '../../objects/light';
+import { Origin } from '../../objects/origin';
 import { InteractionService } from '../interaction/interaction.service';
 import { CameraService } from './camera.service';
 import { ObjectTrackerService } from './object-tracker.service';
@@ -33,11 +38,11 @@ export class ThreeService {
     document.body.appendChild(renderer.domElement);
 
     this.addObjectToScene(new Light());
-    this.addObjectToScene(new Grid(10, 20));
-    this.addObjectToScene(new Cube(0, -2, 0));
-    this.addObjectToScene(new Cube(1, 1, 2));
-    this.addObjectToScene(new Cube(-4, 0, 1));
-    this.addObjectToScene(this.cameraService.getCameraBoom());
+    this.addObjectToScene(new Origin());
+    this.addObjectToScene(new Grid(DEFAULTWORLDSIZE, DEFAULTWORLDSIZE * 2));
+    // this.addObjectToScene(new Cube(0, -2, 0));
+    // this.addObjectToScene(new Cube(1, 1, 2));
+    // this.addObjectToScene(new Cube(-4, 0, 1));
     const animate = () => {
       const currentTime = new Date().getTime();
       if (currentTime - this.lastRenderTime > 1000 / FPS) {
@@ -49,6 +54,8 @@ export class ThreeService {
 
     renderer.setClearColor(DEFAULTBACKGROUND);
     renderer.setAnimationLoop(animate);
+
+    this.scene.fog = DEFAULTFOG;
 
     window.addEventListener(
       'resize',
@@ -85,7 +92,7 @@ export class ThreeService {
 
   private objectIsTracked(sceneObject: ISceneObject): boolean {
     for (let trackedObject of this.objectTrackerService.getObjects()) {
-      if (trackedObject.id.equals(sceneObject.id)) {
+      if (trackedObject.group.id === sceneObject.group.id) {
         return true;
       }
     }

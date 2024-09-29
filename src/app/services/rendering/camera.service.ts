@@ -7,10 +7,12 @@ import {
   FOV,
   NEARCLIPPINGPLANE,
 } from '../../constants';
+import {
+  getCartesianCoordinate,
+  getSphericalCoordinate,
+} from '../../helpers/coordinate-helpers';
 import { IKeyboardInteractable } from '../../interfaces/keyboard-interactable';
 import { IMouseInteractable } from '../../interfaces/mouse-interactable';
-import { ISceneObject } from '../../interfaces/scene-object';
-import { CameraBoom } from '../../objects/camera-boom';
 
 enum MouseButton {
   Left,
@@ -25,7 +27,6 @@ export class CameraService
   implements IMouseInteractable, IKeyboardInteractable
 {
   private readonly camera: THREE.PerspectiveCamera;
-  private readonly cameraBoom: ISceneObject;
   private mouseDown = false;
   private shiftPressed = false;
   private controlPressed = false;
@@ -39,8 +40,6 @@ export class CameraService
       FARCLIPPINGPLANE
     );
 
-    this.cameraBoom = new CameraBoom(0, 0, 0);
-    this.cameraBoom.group.add(this.camera);
     this.camera.position.set(
       DEFAULTCAMERAPOSITION.x,
       DEFAULTCAMERAPOSITION.y,
@@ -48,10 +47,6 @@ export class CameraService
     );
 
     this.camera.lookAt(0, 0, 0);
-  }
-
-  getCameraBoom(): CameraBoom {
-    return this.cameraBoom;
   }
 
   onKeyDown(event: KeyboardEvent): void {
@@ -87,26 +82,33 @@ export class CameraService
       return;
     }
 
-    if (
-      this.mouseButton === MouseButton.Left ||
-      this.mouseButton === MouseButton.Middle
-    ) {
-      if (this.shiftPressed || this.mouseButton === MouseButton.Middle) {
-        this.cameraBoom.group.rotation.y -=
-          event.movementX * DEFAULTMOUSESENSITIVITY;
-        this.camera.lookAt(0, 0, 0);
+    if (this.mouseButton === MouseButton.Left) {
+      const spherical = getSphericalCoordinate(this.camera.position);
+
+      const xMovement = event.movementX * DEFAULTMOUSESENSITIVITY;
+      const yMovement = event.movementY * DEFAULTMOUSESENSITIVITY;
+
+      spherical.phi += xMovement;
+      spherical.theta += yMovement;
+
+      console.log(spherical.phi, spherical.theta);
+
+      // Limit to avoid jank
+      const floorLimit = Math.PI / 2;
+      if (spherical.theta > floorLimit) {
+        spherical.theta = floorLimit;
       }
 
-      if (this.controlPressed || this.mouseButton === MouseButton.Middle) {
-        this.cameraBoom.group.rotation.x +=
-          event.movementY * DEFAULTMOUSESENSITIVITY;
-        this.camera.lookAt(0, 0, 0);
+      const heightLimit = 1e-3;
+      if (spherical.theta < heightLimit) {
+        spherical.theta = heightLimit;
       }
 
-      if (!this.controlPressed && !this.shiftPressed) {
-        this.camera.position.y += event.movementY * DEFAULTMOUSESENSITIVITY;
-        this.camera.position.x -= event.movementX * DEFAULTMOUSESENSITIVITY;
-      }
+      const newPosition = getCartesianCoordinate(spherical);
+
+      this.camera.position.set(newPosition.x, newPosition.y, newPosition.z);
+
+      this.camera.lookAt(0, 0, 0);
     }
   }
 

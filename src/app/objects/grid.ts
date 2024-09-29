@@ -1,14 +1,11 @@
-import { Guid } from 'guid-typescript';
 import * as THREE from 'three';
 import { ISceneObject } from '../interfaces/scene-object';
 
 export class Grid implements ISceneObject {
-  id: Guid;
   group: THREE.Group;
   existsInScene: boolean = false;
 
   constructor(size: number, divisions: number) {
-    this.id = Guid.create();
     this.group = new THREE.Group();
     this.group.add(new THREE.GridHelper(size, divisions));
   }
