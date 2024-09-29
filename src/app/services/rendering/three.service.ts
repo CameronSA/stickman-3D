@@ -32,12 +32,7 @@ export class ThreeService {
     document.body.appendChild(renderer.domElement);
 
     this.addObjectToScene(new Light());
-    // this.addObjectToScene(new Origin());
     this.addObjectToScene(new Floor());
-    // this.addObjectToScene(new Grid(DEFAULTWORLDSIZE, DEFAULTWORLDSIZE * 2));
-    // this.addObjectToScene(new Cube(0, -2, 0));
-    // this.addObjectToScene(new Cube(1, 1, 2));
-    // this.addObjectToScene(new Cube(-4, 0, 1));
     const animate = () => {
       const currentTime = new Date().getTime();
       if (currentTime - this.lastRenderTime > 1000 / FPS) {

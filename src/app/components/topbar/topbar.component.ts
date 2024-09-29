@@ -24,7 +24,9 @@ export class TopbarComponent {
   constructor(
     private readonly threeService: ThreeService,
     private readonly cameraService: CameraService
-  ) {}
+  ) {
+    this.onToggleGridClick();
+  }
 
   onToggleGridClick() {
     this.gridVisible = !this.gridVisible;

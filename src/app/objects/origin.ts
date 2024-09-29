@@ -11,11 +11,10 @@ export class Origin implements ISceneObject {
   constructor() {
     this.group = new THREE.Group();
 
-    const length = 0.5;
     const origin = new THREE.Vector3();
-    const xDir = new THREE.Vector3(1, 0, 0);
-    const yDir = new THREE.Vector3(0, 1, 0);
-    const zDir = new THREE.Vector3(0, 0, 1);
+    const xDir = new THREE.Vector3(5, 0, 0);
+    const yDir = new THREE.Vector3(0, 5, 0);
+    const zDir = new THREE.Vector3(0, 0, 5);
 
     const xArrow = this.arrow(xDir, origin, 0xff0000);
     const yArrow = this.arrow(yDir, origin, 0x00ff00);
@@ -32,11 +31,11 @@ export class Origin implements ISceneObject {
     target: THREE.Vector3,
     origin: THREE.Vector3,
     color: THREE.ColorRepresentation,
-    thickness = 0.01
+    thickness = 0.1
   ): THREE.Group {
     const direction = target.clone().sub(origin).normalize();
     const coneHeight = thickness * 10;
-    const magnitude = direction.length() / 2 - coneHeight / 2;
+    const magnitude = target.length() / 2 - coneHeight / 2;
 
     const cylinderGeometry = new THREE.CylinderGeometry(
       thickness,
