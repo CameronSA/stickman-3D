@@ -1,8 +1,10 @@
+import { Guid } from 'guid-typescript';
 import * as THREE from 'three';
 import { getSphericalCoordinate } from '../helpers/coordinate-helpers';
 import { ISceneObject } from '../interfaces/scene-object';
 
 export class Origin implements ISceneObject {
+  id: Guid = Guid.create();
   group: THREE.Group;
   existsInScene: boolean = false;
 

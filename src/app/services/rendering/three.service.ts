@@ -1,17 +1,10 @@
 import { Injectable } from '@angular/core';
 import { throttle } from 'lodash-es';
 import * as THREE from 'three';
-import {
-  DEFAULTBACKGROUND,
-  DEFAULTFOG,
-  DEFAULTWORLDSIZE,
-  FPS,
-} from '../../constants';
+import { DEFAULTBACKGROUND, DEFAULTFOG, FPS } from '../../constants';
 import { ISceneObject } from '../../interfaces/scene-object';
 import { Floor } from '../../objects/floor';
-import { Grid } from '../../objects/grid';
 import { Light } from '../../objects/light';
-import { Origin } from '../../objects/origin';
 import { InteractionService } from '../interaction/interaction.service';
 import { CameraService } from './camera.service';
 import { ObjectTrackerService } from './object-tracker.service';
@@ -39,9 +32,9 @@ export class ThreeService {
     document.body.appendChild(renderer.domElement);
 
     this.addObjectToScene(new Light());
-    this.addObjectToScene(new Origin());
+    // this.addObjectToScene(new Origin());
     this.addObjectToScene(new Floor());
-    this.addObjectToScene(new Grid(DEFAULTWORLDSIZE, DEFAULTWORLDSIZE * 2));
+    // this.addObjectToScene(new Grid(DEFAULTWORLDSIZE, DEFAULTWORLDSIZE * 2));
     // this.addObjectToScene(new Cube(0, -2, 0));
     // this.addObjectToScene(new Cube(1, 1, 2));
     // this.addObjectToScene(new Cube(-4, 0, 1));
@@ -92,9 +85,15 @@ export class ThreeService {
     }
   }
 
+  removeObjectFromScene(sceneObject: ISceneObject) {
+    this.objectTrackerService.deleteObject(sceneObject);
+    this.scene.remove(sceneObject.group);
+    sceneObject.existsInScene = false;
+  }
+
   private objectIsTracked(sceneObject: ISceneObject): boolean {
     for (let trackedObject of this.objectTrackerService.getObjects()) {
-      if (trackedObject.group.id === sceneObject.group.id) {
+      if (trackedObject.id.equals(sceneObject.id)) {
         return true;
       }
     }

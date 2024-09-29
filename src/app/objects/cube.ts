@@ -1,7 +1,9 @@
+import { Guid } from 'guid-typescript';
 import * as THREE from 'three';
 import { ISceneObject } from '../interfaces/scene-object';
 
 export class Cube implements ISceneObject {
+  id: Guid = Guid.create();
   group: THREE.Group;
   existsInScene: boolean = false;
 

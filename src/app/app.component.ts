@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { TopbarComponent } from './components/topbar/topbar.component';
 import { ThreeService } from './services/rendering/three.service';
 
 @Component({
@@ -6,6 +7,7 @@ import { ThreeService } from './services/rendering/three.service';
   standalone: true,
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
+  imports: [TopbarComponent],
 })
 export class AppComponent implements OnInit {
   constructor(private readonly threeService: ThreeService) {}
