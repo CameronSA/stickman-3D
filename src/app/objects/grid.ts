@@ -7,7 +7,8 @@ export class Grid implements ISceneObject {
 
   constructor(size: number, divisions: number) {
     this.group = new THREE.Group();
-    this.group.add(new THREE.GridHelper(size, divisions));
+    const grid = new THREE.GridHelper(size, divisions);
+    this.group.add(grid);
   }
 
   update() {}

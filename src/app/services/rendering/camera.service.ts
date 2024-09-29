@@ -77,12 +77,24 @@ export class CameraService
   }
 
   onMouseMove(event: MouseEvent): void {
-    // TODO: use spherical coordinates
     if (!this.mouseDown) {
       return;
     }
 
     if (this.mouseButton === MouseButton.Left) {
+      if (this.shiftPressed || this.controlPressed) {
+        // TODO: this only works if camera is aligned with world axis
+        if (this.shiftPressed) {
+          this.camera.position.x -= event.movementX * DEFAULTMOUSESENSITIVITY;
+        }
+
+        if (this.controlPressed) {
+          this.camera.position.z += event.movementY * DEFAULTMOUSESENSITIVITY;
+        }
+
+        return;
+      }
+
       const spherical = getSphericalCoordinate(this.camera.position);
 
       const xMovement = event.movementX * DEFAULTMOUSESENSITIVITY;
@@ -91,10 +103,8 @@ export class CameraService
       spherical.phi += xMovement;
       spherical.theta += yMovement;
 
-      console.log(spherical.phi, spherical.theta);
-
       // Limit to avoid jank
-      const floorLimit = Math.PI / 2;
+      const floorLimit = Math.PI / 2 - 0.04;
       if (spherical.theta > floorLimit) {
         spherical.theta = floorLimit;
       }
@@ -120,19 +130,14 @@ export class CameraService
       cameraDirection.negate();
     }
 
-    this.appendPosition(cameraDirection);
-  }
+    if (
+      this.camera.position.z + cameraDirection.z < 0 &&
+      this.camera.position.z >= 0
+    ) {
+      return;
+    }
 
-  updatePosition(position: THREE.Vector3) {
-    this.camera.position.x = position.x;
-    this.camera.position.y = position.y;
-    this.camera.position.z = position.z;
-  }
-
-  appendPosition(position: THREE.Vector3) {
-    this.camera.position.x = position.x + this.camera.position.x;
-    this.camera.position.y = position.y + this.camera.position.y;
-    this.camera.position.z = position.z + this.camera.position.z;
+    this.camera.position.add(cameraDirection);
   }
 
   getCamera(): THREE.PerspectiveCamera {

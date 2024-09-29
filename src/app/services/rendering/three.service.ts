@@ -8,6 +8,7 @@ import {
   FPS,
 } from '../../constants';
 import { ISceneObject } from '../../interfaces/scene-object';
+import { Floor } from '../../objects/floor';
 import { Grid } from '../../objects/grid';
 import { Light } from '../../objects/light';
 import { Origin } from '../../objects/origin';
@@ -39,6 +40,7 @@ export class ThreeService {
 
     this.addObjectToScene(new Light());
     this.addObjectToScene(new Origin());
+    this.addObjectToScene(new Floor());
     this.addObjectToScene(new Grid(DEFAULTWORLDSIZE, DEFAULTWORLDSIZE * 2));
     // this.addObjectToScene(new Cube(0, -2, 0));
     // this.addObjectToScene(new Cube(1, 1, 2));

@@ -55,8 +55,6 @@ export class Origin implements ISceneObject {
 
     const spherical = getSphericalCoordinate(direction);
 
-    console.log(direction, spherical);
-
     const group = new THREE.Group();
     group.add(cylinder, cone);
 
