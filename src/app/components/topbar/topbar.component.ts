@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Cube } from '../../objects/cube';
 import { Grid } from '../../objects/grid';
 import { Origin } from '../../objects/origin';
+import { Stickman } from '../../objects/stickman';
 import { CameraService } from '../../services/rendering/camera.service';
 import { ThreeService } from '../../services/rendering/three.service';
 
@@ -20,12 +21,15 @@ export class TopbarComponent {
   private origin: Origin | undefined = undefined;
   private grid: Grid | undefined = undefined;
   private cubes: Cube[] = [];
+  private stickMan: Stickman | undefined = undefined;
+  private stickManVisible: boolean = false;
 
   constructor(
     private readonly threeService: ThreeService,
     private readonly cameraService: CameraService
   ) {
     this.onToggleGridClick();
+    this.onToggleStickmanClick();
   }
 
   onToggleGridClick() {
@@ -65,6 +69,20 @@ export class TopbarComponent {
       this.threeService.addObjectsToScene(this.cubes);
     } else {
       this.threeService.removeObjectsFromScene(this.cubes);
+    }
+  }
+
+  onToggleStickmanClick() {
+    this.stickManVisible = !this.stickManVisible;
+
+    if (!this.stickMan) {
+      this.stickMan = new Stickman(7, 7, 7);
+    }
+
+    if (this.stickManVisible) {
+      this.threeService.addObjectToScene(this.stickMan);
+    } else {
+      this.threeService.removeObjectFromScene(this.stickMan);
     }
   }
 

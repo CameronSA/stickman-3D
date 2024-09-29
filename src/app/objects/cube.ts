@@ -18,9 +18,9 @@ export class Cube implements ISceneObject {
 
     const cube = new THREE.Mesh(geometry, material);
 
-    var geo = new THREE.EdgesGeometry(cube.geometry); // or
-    var mat = new THREE.LineBasicMaterial({ color: 0x000000 });
-    var wireframe = new THREE.LineSegments(geo, mat);
+    var wireGeometry = new THREE.EdgesGeometry(cube.geometry);
+    var wireMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
+    var wireframe = new THREE.LineSegments(wireGeometry, wireMaterial);
     cube.add(wireframe);
 
     cube.position.x = positionX;
