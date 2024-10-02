@@ -3,7 +3,6 @@ import { throttle } from 'lodash-es';
 import * as THREE from 'three';
 import { DEFAULTBACKGROUND, DEFAULTFOG, FPS } from '../../constants';
 import { ISceneObject } from '../../interfaces/scene-object';
-import { Floor } from '../../objects/floor';
 import { Light } from '../../objects/light';
 import { InteractionService } from '../interaction/interaction.service';
 import { CameraService } from './camera.service';
@@ -32,7 +31,7 @@ export class ThreeService {
     document.body.appendChild(renderer.domElement);
 
     this.addObjectToScene(new Light());
-    this.addObjectToScene(new Floor());
+    // this.addObjectToScene(new Floor());
     const animate = () => {
       const currentTime = new Date().getTime();
       if (currentTime - this.lastRenderTime > 1000 / FPS) {

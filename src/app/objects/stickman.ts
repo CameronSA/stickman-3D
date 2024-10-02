@@ -18,7 +18,7 @@ export class Stickman implements ISceneObject {
       polygonOffsetUnits: 1,
     });
 
-    var wireMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
+    let wireMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
 
     this.group = new THREE.Group();
 

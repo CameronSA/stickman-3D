@@ -1,8 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Color, MeshBasicMaterial } from 'three';
 import { Cube } from '../../objects/cube';
 import { Grid } from '../../objects/grid';
 import { Origin } from '../../objects/origin';
+import { Stick } from '../../objects/stick';
 import { Stickman } from '../../objects/stickman';
 import { CameraService } from '../../services/rendering/camera.service';
 import { ThreeService } from '../../services/rendering/three.service';
@@ -29,7 +31,20 @@ export class TopbarComponent {
     private readonly cameraService: CameraService
   ) {
     this.onToggleGridClick();
-    this.onToggleStickmanClick();
+    // this.onToggleStickmanClick();
+
+    let stick = new Stick(
+      1,
+      10,
+      new MeshBasicMaterial({
+        color: new Color(0xffffff).multiplyScalar(0.5),
+        polygonOffset: true,
+        polygonOffsetFactor: 1,
+        polygonOffsetUnits: 1,
+      }),
+      5
+    );
+    this.threeService.addObjectToScene(stick);
   }
 
   onToggleGridClick() {
@@ -76,7 +91,7 @@ export class TopbarComponent {
     this.stickManVisible = !this.stickManVisible;
 
     if (!this.stickMan) {
-      this.stickMan = new Stickman(7, 7, 7);
+      this.stickMan = new Stickman(0, 3, 0);
     }
 
     if (this.stickManVisible) {
