@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { ISceneObject } from '../interfaces/scene-object';
 
 interface SegmentLink {
-  segment: THREE.Mesh;
+  mesh: THREE.Mesh;
   nextSegment: SegmentLink | undefined;
   startPosition: THREE.Vector3;
   endPosition: THREE.Vector3;
@@ -23,18 +23,70 @@ export class Stick implements ISceneObject {
   ) {
     this.group = new THREE.Group();
 
-    // Generate linked list of stick segments
-    do {
-      let previousSegmentLink = this.tryGetLastSegment();
-      const segmentLink = this.generateSegment(previousSegmentLink.segment);
+    // // Generate linked list of stick segments
+    // do {
+    //   let previousSegmentLink = this.tryGetLastSegment();
+    //   const segmentLink = this.generateSegment(previousSegmentLink.segment);
 
-      if (previousSegmentLink.segment) {
-        this.stickSegments[previousSegmentLink.index].nextSegment = segmentLink;
-      }
+    //   if (previousSegmentLink.segment) {
+    //     this.stickSegments[previousSegmentLink.index].nextSegment = segmentLink;
+    //   }
 
-      this.stickSegments.push(segmentLink);
-      this.group.add(segmentLink.segment);
-    } while (this.stickSegments.length < this.numberOfSegments);
+    //   this.stickSegments.push(segmentLink);
+    //   this.group.add(segmentLink.mesh);
+    // } while (this.stickSegments.length < this.numberOfSegments);
+
+    // this.bendTest();
+
+    const body = this.bendTheCone();
+
+    this.group.add(body);
+    this.group.position.y = 5;
+  }
+
+  update() {}
+
+  bendTheCone(): THREE.Mesh {
+    let angle = Math.PI / 4;
+    var geom = new THREE.CylinderGeometry(
+      this.stickRadius,
+      this.stickRadius,
+      angle
+    );
+
+    geom.translate(10, angle, 0);
+    var position = geom.attributes['position'];
+    for (var i = 0; i < position.count; i++) {
+      var localTheta = position.getY(i);
+      var localRadius = position.getX(i);
+      position.setXY(
+        i,
+        Math.cos(localTheta) * localRadius,
+        Math.sin(localTheta) * localRadius
+      );
+    }
+
+    geom.computeVertexNormals();
+
+    let wireMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
+    let wireGeometry = new THREE.EdgesGeometry(geom);
+    let wireframe = new THREE.LineSegments(wireGeometry, wireMaterial);
+    const body = new THREE.Mesh(geom, this.stickMaterial);
+    body.add(wireframe);
+
+    return body;
+  }
+
+  private bendTest() {
+    const totalAngle = Math.PI / 2;
+    const individualAngle = totalAngle / this.stickSegments.length;
+    for (let i = 0; i < this.stickSegments.length; i++) {
+      const currentAngle = individualAngle * (i + 1);
+      this.stickSegments[i].mesh.rotateZ(currentAngle);
+      this.stickSegments[i].mesh.position.x -=
+        i * (this.stickLength / 8) * Math.sin(currentAngle);
+      console.log(this.stickSegments[i].mesh.position.x, currentAngle);
+    }
   }
 
   private tryGetLastSegment(): {
@@ -98,12 +150,10 @@ export class Stick implements ISceneObject {
     body.add(wireframe);
 
     return {
-      segment: body,
+      mesh: body,
       nextSegment: undefined,
       startPosition: startPosition,
       endPosition: endPosition,
     };
   }
-
-  update() {}
 }
