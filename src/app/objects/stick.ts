@@ -1,35 +1,38 @@
 import { Guid } from 'guid-typescript';
 import * as THREE from 'three';
+import { computeMidpoint } from '../helpers/geometry-helpers';
 import { addWireframe, generateSphere } from '../helpers/object-helpers';
 import { ISceneObject } from '../interfaces/scene-object';
+import { IStickObject } from '../interfaces/stick-object';
 
-interface SegmentLink {
-  mesh: THREE.Mesh;
-  nextSegment: SegmentLink | undefined;
-  startPosition: THREE.Vector3;
-  endPosition: THREE.Vector3;
-}
-
-export class Stick implements ISceneObject {
+export class Stick implements ISceneObject, IStickObject {
   id: Guid = Guid.create();
   group: THREE.Group;
   existsInScene: boolean = false;
+  private readonly stickLength: number = 0;
 
   constructor(
     private readonly stickRadius: number,
-    private readonly stickLength: number,
-    private readonly material: THREE.Material
+    private readonly material: THREE.Material,
+    readonly startPosition: THREE.Vector3,
+    readonly endPosition: THREE.Vector3
   ) {
     this.group = new THREE.Group();
 
-    const startPosition = new THREE.Vector3();
-    const endPosition = new THREE.Vector3(0, this.stickLength, 0);
+    this.stickLength = this.startPosition.distanceTo(this.endPosition);
+
+    const localStartPosition = new THREE.Vector3(0, -this.stickLength / 2, 0);
+    const localEndPosition = new THREE.Vector3(0, this.stickLength / 2, 0);
 
     const body = this.generateCyclinder();
-    const topCap = generateSphere(this.stickRadius, endPosition, this.material);
+    const topCap = generateSphere(
+      this.stickRadius,
+      localEndPosition,
+      this.material
+    );
     const bottomCap = generateSphere(
       this.stickRadius,
-      startPosition,
+      localStartPosition,
       this.material
     );
 
@@ -40,6 +43,16 @@ export class Stick implements ISceneObject {
     this.group.add(body);
     this.group.add(topCap);
     this.group.add(bottomCap);
+
+    const centrePoint = computeMidpoint(this.startPosition, this.endPosition);
+    this.group.position.set(centrePoint.x, centrePoint.y, centrePoint.z);
+
+    const axisOfRotation = new THREE.Vector3(0, 1, 0);
+    const axisOfAlignment = this.endPosition
+      .sub(this.startPosition)
+      .normalize();
+
+    this.group.quaternion.setFromUnitVectors(axisOfRotation, axisOfAlignment);
   }
 
   update() {}
@@ -51,7 +64,6 @@ export class Stick implements ISceneObject {
       this.stickLength
     );
     const body = new THREE.Mesh(bodyGeometry, this.material);
-    body.position.y += this.stickLength / 2;
     return body;
   }
 }

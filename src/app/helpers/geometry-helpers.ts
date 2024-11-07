@@ -55,6 +55,15 @@ export function calculateArcCenters(
   ];
 }
 
+export function computeMidpoint(
+  startPosition: Vector3,
+  endPosition: Vector3
+): Vector3 {
+  const midpoint = new Vector3();
+  midpoint.addVectors(startPosition, endPosition).divideScalar(2);
+  return midpoint;
+}
+
 function square(val: number): number {
   return val * val;
 }

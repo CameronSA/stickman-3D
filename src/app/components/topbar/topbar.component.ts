@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Color, MeshBasicMaterial } from 'three';
-import { BendableStick } from '../../objects/bendable-stick';
+import { Color, MeshBasicMaterial, Vector3 } from 'three';
 import { Cube } from '../../objects/cube';
 import { Grid } from '../../objects/grid';
 import { Origin } from '../../objects/origin';
@@ -35,27 +34,17 @@ export class TopbarComponent {
 
     let stick = new Stick(
       1,
-      10,
       new MeshBasicMaterial({
         color: new Color(0xffffff).multiplyScalar(0.5),
         polygonOffset: true,
         polygonOffsetFactor: 1,
         polygonOffsetUnits: 1,
-      })
+      }),
+      new Vector3(0, 0, 0),
+      new Vector3(10, 10, 10)
     );
 
-    let bendyStick = new BendableStick(
-      1,
-      10,
-      new MeshBasicMaterial({
-        color: new Color(0xffffff).multiplyScalar(0.5),
-        polygonOffset: true,
-        polygonOffsetFactor: 1,
-        polygonOffsetUnits: 1,
-      })
-    );
-
-    this.threeService.addObjectToScene(bendyStick);
+    this.threeService.addObjectToScene(stick);
   }
 
   onToggleGridClick() {
