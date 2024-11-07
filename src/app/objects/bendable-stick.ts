@@ -4,6 +4,7 @@ import {
   calculateArcAngle,
   calculateArcRadius,
 } from '../helpers/geometry-helpers';
+import { addWireframe, generateSphere } from '../helpers/object-helpers';
 import { ISceneObject } from '../interfaces/scene-object';
 
 export class BendableStick implements ISceneObject {
@@ -11,26 +12,42 @@ export class BendableStick implements ISceneObject {
   group: THREE.Group;
   existsInScene: boolean = false;
 
+  private readonly tolerance: number = 1e-10;
+
   constructor(
     private readonly stickRadius: number,
-    private readonly stickLength: number
+    private readonly stickLength: number,
+    private readonly material: THREE.Material
   ) {
     this.group = new THREE.Group();
 
     const startPosition = new THREE.Vector3();
     const endPosition = new THREE.Vector3(0, this.stickLength, 0);
 
+    const topCap = generateSphere(this.stickRadius, endPosition, this.material);
+    const bottomCap = generateSphere(
+      this.stickRadius,
+      startPosition,
+      this.material
+    );
+
     const endOfArcPosition = new THREE.Vector3(
       endPosition.x,
-      endPosition.y - 1,
+      endPosition.y - this.tolerance,
       endPosition.z
     );
 
-    endOfArcPosition.applyAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 4);
+    // endOfArcPosition.applyAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 4);
 
     const torus = this.generateTorus(startPosition, endOfArcPosition);
 
+    addWireframe(topCap);
+    addWireframe(bottomCap);
+    addWireframe(torus);
+
     this.group.add(torus);
+    this.group.add(topCap);
+    this.group.add(bottomCap);
   }
 
   update() {}
@@ -39,13 +56,6 @@ export class BendableStick implements ISceneObject {
     startPosition: THREE.Vector3,
     endPosition: THREE.Vector3
   ): THREE.Mesh {
-    const material = new THREE.MeshBasicMaterial({
-      color: new THREE.Color(0xffffff).multiplyScalar(0.5),
-      polygonOffset: true,
-      polygonOffsetFactor: 1,
-      polygonOffsetUnits: 1,
-    });
-
     const arcAngle = calculateArcAngle(
       startPosition,
       endPosition,
@@ -57,19 +67,17 @@ export class BendableStick implements ISceneObject {
     const geometry = new THREE.TorusGeometry(
       arcRadius,
       this.stickRadius,
-      12,
+      32,
       48,
       arcAngle
     );
-
-    console.log(startPosition, endPosition, arcAngle, arcRadius);
 
     let startX = -arcRadius;
     if (endPosition.x > startPosition.x) {
       startX = arcRadius;
     }
 
-    const mesh = new THREE.Mesh(geometry, material);
+    const mesh = new THREE.Mesh(geometry, this.material);
     mesh.position.set(startX, 0, 0);
 
     return mesh;
