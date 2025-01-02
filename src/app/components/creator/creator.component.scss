@@ -1,0 +1,16 @@
+:host {
+  display: block;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.top-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: right;
+  padding: 0.1rem;
+  border-bottom: 0.1rem solid black;
+}

@@ -14,6 +14,7 @@ import { ObjectTrackerService } from './object-tracker.service';
 export class ThreeService {
   private lastRenderTime: number = new Date().getTime();
   private scene: THREE.Scene;
+  private container: HTMLElement | undefined = undefined;
 
   constructor(
     private readonly objectTrackerService: ObjectTrackerService,
@@ -23,12 +24,13 @@ export class ThreeService {
     this.scene = new THREE.Scene();
   }
 
-  createThreeJsBox(): void {
+  createThreeJsBox(containerElementId: string): void {
+    this.container = document.getElementById(containerElementId) as HTMLElement;
     this.interactionService.addInteractable(this.cameraService);
     const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(this.container.offsetWidth, this.container.offsetHeight);
     renderer.setPixelRatio(devicePixelRatio);
-    document.body.appendChild(renderer.domElement);
+    this.container.appendChild(renderer.domElement);
 
     this.addObjectToScene(new Light());
     // this.addObjectToScene(new Floor());
@@ -51,8 +53,13 @@ export class ThreeService {
       'resize',
       throttle(
         () => {
-          this.cameraService.rescale(window.innerWidth / window.innerHeight);
-          renderer.setSize(window.innerWidth, window.innerHeight);
+          this.cameraService.rescale(
+            this.container?.offsetWidth! / this.container?.offsetHeight!
+          );
+          renderer.setSize(
+            this.container?.offsetWidth!,
+            this.container?.offsetHeight!
+          );
         },
         1000 / FPS,
         { trailing: true }

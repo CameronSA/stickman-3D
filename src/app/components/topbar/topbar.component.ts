@@ -1,10 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Color, MeshBasicMaterial, Vector3 } from 'three';
 import { Cube } from '../../objects/cube';
 import { Grid } from '../../objects/grid';
 import { Origin } from '../../objects/origin';
-import { Stick } from '../../objects/stick';
 import { CameraService } from '../../services/rendering/camera.service';
 import { ThreeService } from '../../services/rendering/three.service';
 
@@ -29,19 +27,19 @@ export class TopbarComponent {
   ) {
     this.onToggleGridClick();
 
-    let stick = new Stick(
-      1,
-      new MeshBasicMaterial({
-        color: new Color(0xffffff).multiplyScalar(0.5),
-        polygonOffset: true,
-        polygonOffsetFactor: 1,
-        polygonOffsetUnits: 1,
-      }),
-      new Vector3(0, 0, 0),
-      new Vector3(10, 10, 10)
-    );
+    // let stick = new Stick(
+    //   1,
+    //   new MeshBasicMaterial({
+    //     color: new Color(0xffffff).multiplyScalar(0.5),
+    //     polygonOffset: true,
+    //     polygonOffsetFactor: 1,
+    //     polygonOffsetUnits: 1,
+    //   }),
+    //   new Vector3(0, 0, 0),
+    //   new Vector3(10, 10, 10)
+    // );
 
-    this.threeService.addObjectToScene(stick);
+    // this.threeService.addObjectToScene(stick);
   }
 
   onToggleGridClick() {
