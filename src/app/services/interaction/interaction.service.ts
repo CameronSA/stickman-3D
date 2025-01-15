@@ -104,6 +104,7 @@ export class InteractionService {
   }
 
   private isMouseInteractable(object: ISceneObject): boolean {
+    // There isn't a way to check if an object inherits from an interface, so this will have to do
     return 'onMouseDown' in object;
   }
 
