@@ -1,5 +1,17 @@
 <div class="container">
-  <div class="top-bar">
-    <button type="button" (click)="onCloseClick()">X</button>
+  <div class="row">
+    <div class="cell" (click)="onItemClick(1, $event)">1</div>
+    <div class="cell" (click)="onItemClick(2, $event)">2</div>
+    <div class="cell" (click)="onItemClick(3, $event)">3</div>
+  </div>
+  <div class="row">
+    <div class="cell" (click)="onItemClick(4, $event)">4</div>
+    <div class="cell" (click)="onItemClick(5, $event)">5</div>
+    <div class="cell" (click)="onItemClick(6, $event)">6</div>
+  </div>
+  <div class="row">
+    <div class="cell" (click)="onItemClick(7, $event)">7</div>
+    <div class="cell" (click)="onItemClick(8, $event)">8</div>
+    <div class="cell" (click)="onItemClick(9, $event)">9</div>
   </div>
 </div>

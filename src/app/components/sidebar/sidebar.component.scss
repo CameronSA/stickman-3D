@@ -4,6 +4,11 @@
 
 .container {
   display: flex;
+  justify-content: center;
+}
+
+.creator-container {
+  padding: 0.5rem;
 }
 
 .button-container {
@@ -12,12 +17,4 @@
 
 button {
   cursor: pointer;
-}
-
-.creator-container {
-  width: 20%;
-  height: 50%;
-  position: absolute;
-  border: 0.1rem solid black;
-  background-color: white;
 }

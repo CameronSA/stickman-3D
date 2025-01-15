@@ -5,12 +5,19 @@
 .container {
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
 
-.top-bar {
+.row {
   display: flex;
   flex-direction: row;
-  justify-content: right;
-  padding: 0.1rem;
-  border-bottom: 0.1rem solid black;
+}
+
+.cell {
+  border: 0.1rem solid black;
+  padding: 0.6rem;
+  cursor: pointer;
+}
+.cell:hover {
+  background-color: grey;
 }

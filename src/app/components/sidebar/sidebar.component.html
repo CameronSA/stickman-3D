@@ -1,13 +1,5 @@
 <div class="container">
-  <div class="button-container">
-    <button type="button" (click)="onCreateClick()">Create</button>
+  <div class="creator-container">
+    <app-creator></app-creator>
   </div>
-</div>
-
-<div
-  *ngIf="showCreator"
-  class="creator-container"
-  (mousedown)="mousedown($event)"
->
-  <app-creator (closed)="showCreator = false"></app-creator>
 </div>

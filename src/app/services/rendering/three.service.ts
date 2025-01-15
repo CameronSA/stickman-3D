@@ -15,6 +15,7 @@ export class ThreeService {
   private lastRenderTime: number = new Date().getTime();
   private scene: THREE.Scene;
   private container: HTMLElement | undefined = undefined;
+  private readonly renderer = new THREE.WebGLRenderer();
 
   constructor(
     private readonly objectTrackerService: ObjectTrackerService,
@@ -26,26 +27,30 @@ export class ThreeService {
 
   createThreeJsBox(containerElementId: string): void {
     this.container = document.getElementById(containerElementId) as HTMLElement;
+    this.interactionService.setSceneSize(this.container);
     this.interactionService.addInteractable(this.cameraService);
-    const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(this.container.offsetWidth, this.container.offsetHeight);
-    renderer.setPixelRatio(devicePixelRatio);
-    this.container.appendChild(renderer.domElement);
+    this.renderer.setSize(
+      this.container.offsetWidth,
+      this.container.offsetHeight
+    );
+    this.renderer.setPixelRatio(devicePixelRatio);
+    this.container.appendChild(this.renderer.domElement);
 
     this.addObjectToScene(new Light());
     // this.addObjectToScene(new Floor());
+
     const animate = () => {
       const currentTime = new Date().getTime();
       if (currentTime - this.lastRenderTime > 1000 / FPS) {
         this.lastRenderTime += 1000 / FPS;
         this.updateObjects();
-        renderer.render(this.scene, this.cameraService.getCamera());
+        this.renderer.render(this.scene, this.cameraService.getCamera());
         this.cameraService.updatePositionIfMoving();
       }
     };
 
-    renderer.setClearColor(DEFAULTBACKGROUND);
-    renderer.setAnimationLoop(animate);
+    this.renderer.setClearColor(DEFAULTBACKGROUND);
+    this.renderer.setAnimationLoop(animate);
 
     this.scene.fog = DEFAULTFOG;
 
@@ -56,10 +61,11 @@ export class ThreeService {
           this.cameraService.rescale(
             this.container?.offsetWidth! / this.container?.offsetHeight!
           );
-          renderer.setSize(
+          this.renderer.setSize(
             this.container?.offsetWidth!,
             this.container?.offsetHeight!
           );
+          this.interactionService.setSceneSize(this.container!);
         },
         1000 / FPS,
         { trailing: true }
