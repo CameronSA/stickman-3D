@@ -15,7 +15,6 @@ export class CreatorComponent {
   constructor(public readonly threeService: ThreeService) {}
 
   onItemClick(cellId: number, event: any) {
-    console.log(event);
     let stick = new Stick(
       1,
       new MeshBasicMaterial({
@@ -25,7 +24,7 @@ export class CreatorComponent {
         polygonOffsetUnits: 1,
       }),
       new Vector3(0, 0, 0),
-      new Vector3(10, 10, 10)
+      new Vector3(0, 10, 0)
     );
 
     this.threeService.addObjectToScene(stick);

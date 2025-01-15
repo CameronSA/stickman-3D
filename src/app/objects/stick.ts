@@ -2,10 +2,11 @@ import { Guid } from 'guid-typescript';
 import * as THREE from 'three';
 import { computeMidpoint } from '../helpers/geometry-helpers';
 import { addWireframe, generateSphere } from '../helpers/object-helpers';
+import { IMouseInteractable } from '../interfaces/mouse-interactable';
 import { ISceneObject } from '../interfaces/scene-object';
 import { IStickObject } from '../interfaces/stick-object';
 
-export class Stick implements ISceneObject, IStickObject {
+export class Stick implements ISceneObject, IStickObject, IMouseInteractable {
   id: Guid = Guid.create();
   group: THREE.Group;
   existsInScene: boolean = false;
@@ -53,6 +54,22 @@ export class Stick implements ISceneObject, IStickObject {
       .normalize();
 
     this.group.quaternion.setFromUnitVectors(axisOfRotation, axisOfAlignment);
+  }
+
+  onMouseDown(event: MouseEvent): void {
+    throw new Error('Method not implemented.');
+  }
+
+  onMouseUp(event: MouseEvent): void {
+    throw new Error('Method not implemented.');
+  }
+
+  onMouseMove(event: MouseEvent): void {
+    throw new Error('Method not implemented.');
+  }
+
+  onWheel(event: WheelEvent): void {
+    throw new Error('Method not implemented.');
   }
 
   update() {}
