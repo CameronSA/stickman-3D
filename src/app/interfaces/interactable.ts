@@ -1,1 +1,3 @@
-export interface IInteractable {}
+export interface IInteractable {
+  id: string;
+}

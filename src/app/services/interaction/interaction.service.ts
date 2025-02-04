@@ -15,6 +15,7 @@ export class InteractionService {
   private readonly raycaster = new THREE.Raycaster();
   private sceneSize = new THREE.Vector2();
   private sceneOffset = new THREE.Vector2();
+  private selectedMouseInteractable: IMouseInteractable | undefined = undefined;
 
   private interactionEnabled: boolean = true;
 
@@ -74,7 +75,9 @@ export class InteractionService {
     return new THREE.Vector2(normalizedPosX, normalizedPosY);
   }
 
-  private getSceneIntersections(event: MouseEvent): ISceneObject | undefined {
+  private getSceneIntersections(
+    event: MouseEvent
+  ): IMouseInteractable | undefined {
     this.raycaster.setFromCamera(
       this.mousePositionToThreeSpace(event.clientX, event.clientY),
       this.cameraService.getCamera()
@@ -104,7 +107,7 @@ export class InteractionService {
 
         for (let sceneObject of sceneObjects) {
           if (sceneObject.meshIds.includes(targetId)) {
-            return sceneObject;
+            return this.toMouseInteractable(sceneObject);
           }
         }
       } catch {
@@ -120,9 +123,24 @@ export class InteractionService {
     return 'onMouseDown' in object;
   }
 
+  private toMouseInteractable(object: ISceneObject): IMouseInteractable {
+    if (this.isMouseInteractable(object)) {
+      return object as unknown as IMouseInteractable;
+    }
+
+    throw new Error(
+      'Tried to convert a non mouse interactable object to a mouse interactable object'
+    );
+  }
+
   private onMouseDown(event: MouseEvent): void {
     if (!this.interactionEnabled) {
       return;
+    }
+
+    const sceneObject = this.getSceneIntersections(event);
+    if (sceneObject) {
+      this.selectedMouseInteractable = sceneObject;
     }
 
     for (let interactable of this.mouseInteractables) {
@@ -135,6 +153,8 @@ export class InteractionService {
       return;
     }
 
+    this.selectedMouseInteractable = undefined;
+
     for (let interactable of this.mouseInteractables) {
       interactable.onMouseUp(event);
     }
@@ -145,12 +165,12 @@ export class InteractionService {
       return;
     }
 
-    const sceneObject = this.getSceneIntersections(event);
-    console.log(sceneObject);
-
-    for (let interactable of this.mouseInteractables) {
-      interactable.onMouseMove(event);
+    if (!this.selectedMouseInteractable) {
+      this.cameraService.onMouseMove(event);
+      return;
     }
+
+    this.selectedMouseInteractable.onMouseMove(event);
   }
 
   private onKeyDown(event: KeyboardEvent): void {

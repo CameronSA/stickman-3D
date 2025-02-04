@@ -26,6 +26,7 @@ enum MouseButton {
 export class CameraService
   implements IMouseInteractable, IKeyboardInteractable
 {
+  id = 'camera';
   private readonly camera: THREE.PerspectiveCamera;
   private mouseDown = false;
   private shiftPressed = false;
