@@ -11,6 +11,7 @@ export class Stick implements ISceneObject, IStickObject, IMouseInteractable {
   group: THREE.Group;
   existsInScene: boolean = false;
   private readonly stickLength: number = 0;
+  private mouseControlsShown = false;
 
   constructor(
     private readonly stickRadius: number,
@@ -76,6 +77,24 @@ export class Stick implements ISceneObject, IStickObject, IMouseInteractable {
   }
 
   update() {}
+
+  showMouseControls(): void {
+    if (this.mouseControlsShown) {
+      return;
+    }
+
+    this.mouseControlsShown = true;
+    console.log('showMouseControls');
+  }
+
+  hideMouseControls(): void {
+    if (!this.mouseControlsShown) {
+      return;
+    }
+
+    this.mouseControlsShown = false;
+    console.log('hideMouseControls');
+  }
 
   private generateCyclinder(): THREE.Mesh {
     const bodyGeometry = new THREE.CylinderGeometry(

@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { IKeyboardInteractable } from '../../interfaces/keyboard-interactable';
 import { IMouseInteractable } from '../../interfaces/mouse-interactable';
 import { ISceneObject } from '../../interfaces/scene-object';
+import { IStickObject } from '../../interfaces/stick-object';
 import { CameraService } from '../rendering/camera.service';
 import { ObjectTrackerService } from '../rendering/object-tracker.service';
 
@@ -16,7 +17,7 @@ export class InteractionService {
   private sceneSize = new THREE.Vector2();
   private sceneOffset = new THREE.Vector2();
   private selectedMouseInteractable: IMouseInteractable | undefined = undefined;
-
+  private mouseDepressed: boolean = false;
   private interactionEnabled: boolean = true;
 
   constructor(
@@ -119,18 +120,19 @@ export class InteractionService {
   }
 
   private isMouseInteractable(object: ISceneObject): boolean {
-    // There isn't a way to check if an object inherits from an interface, so this will have to do
     return 'onMouseDown' in object;
   }
 
   private toMouseInteractable(object: ISceneObject): IMouseInteractable {
-    if (this.isMouseInteractable(object)) {
-      return object as unknown as IMouseInteractable;
-    }
+    return object as unknown as IMouseInteractable;
+  }
 
-    throw new Error(
-      'Tried to convert a non mouse interactable object to a mouse interactable object'
-    );
+  private isStickObject(object: any): boolean {
+    return 'showMouseControls' in object;
+  }
+
+  private toStickObject(object: any): IStickObject {
+    return object as unknown as IStickObject;
   }
 
   private onMouseDown(event: MouseEvent): void {
@@ -146,6 +148,8 @@ export class InteractionService {
     for (let interactable of this.mouseInteractables) {
       interactable.onMouseDown(event);
     }
+
+    this.mouseDepressed = true;
   }
 
   private onMouseUp(event: MouseEvent): void {
@@ -158,6 +162,8 @@ export class InteractionService {
     for (let interactable of this.mouseInteractables) {
       interactable.onMouseUp(event);
     }
+
+    this.mouseDepressed = false;
   }
 
   private onMouseMove(event: MouseEvent): void {
@@ -167,10 +173,27 @@ export class InteractionService {
 
     if (!this.selectedMouseInteractable) {
       this.cameraService.onMouseMove(event);
+    } else {
+      this.selectedMouseInteractable.onMouseMove(event);
+    }
+
+    if (this.mouseDepressed) {
       return;
     }
 
-    this.selectedMouseInteractable.onMouseMove(event);
+    const sceneObject = this.getSceneIntersections(event);
+
+    if (sceneObject && this.isStickObject(sceneObject)) {
+      this.toStickObject(sceneObject).showMouseControls();
+    }
+
+    for (let object of this.objectTrackerService.getObjects()) {
+      if (this.isStickObject(object)) {
+        if (object.id !== sceneObject?.id) {
+          this.toStickObject(object).hideMouseControls();
+        }
+      }
+    }
   }
 
   private onKeyDown(event: KeyboardEvent): void {
