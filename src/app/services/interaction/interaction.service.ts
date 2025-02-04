@@ -16,7 +16,12 @@ export class InteractionService {
   private readonly raycaster = new THREE.Raycaster();
   private sceneSize = new THREE.Vector2();
   private sceneOffset = new THREE.Vector2();
-  private selectedMouseInteractable: IMouseInteractable | undefined = undefined;
+  private selectedMouseInteractable:
+    | {
+        interactable: IMouseInteractable;
+        intersection: THREE.Intersection;
+      }
+    | undefined = undefined;
   private mouseDepressed: boolean = false;
   private interactionEnabled: boolean = true;
 
@@ -76,9 +81,12 @@ export class InteractionService {
     return new THREE.Vector2(normalizedPosX, normalizedPosY);
   }
 
-  private getSceneIntersections(
-    event: MouseEvent
-  ): IMouseInteractable | undefined {
+  private getSceneIntersections(event: MouseEvent):
+    | {
+        interactable: IMouseInteractable;
+        intersection: THREE.Intersection;
+      }
+    | undefined {
     this.raycaster.setFromCamera(
       this.mousePositionToThreeSpace(event.clientX, event.clientY),
       this.cameraService.getCamera()
@@ -107,8 +115,11 @@ export class InteractionService {
         const targetId = intersection.object.parent?.uuid;
 
         for (let sceneObject of sceneObjects) {
-          if (sceneObject.meshIds.includes(targetId)) {
-            return this.toMouseInteractable(sceneObject);
+          if (sceneObject.id.includes(targetId)) {
+            return {
+              interactable: this.toMouseInteractable(sceneObject),
+              intersection: intersection,
+            };
           }
         }
       } catch {
@@ -127,11 +138,13 @@ export class InteractionService {
     return object as unknown as IMouseInteractable;
   }
 
-  private isStickObject(object: any): boolean {
+  private isStickObject(object: IMouseInteractable | ISceneObject): boolean {
     return 'showMouseControls' in object;
   }
 
-  private toStickObject(object: any): IStickObject {
+  private toStickObject(
+    object: IMouseInteractable | ISceneObject
+  ): IStickObject {
     return object as unknown as IStickObject;
   }
 
@@ -143,10 +156,14 @@ export class InteractionService {
     const sceneObject = this.getSceneIntersections(event);
     if (sceneObject) {
       this.selectedMouseInteractable = sceneObject;
-    }
-
-    for (let interactable of this.mouseInteractables) {
-      interactable.onMouseDown(event);
+      this.selectedMouseInteractable.interactable.onMouseDown(
+        event,
+        sceneObject.intersection
+      );
+    } else {
+      for (let interactable of this.mouseInteractables) {
+        interactable.onMouseDown(event, undefined);
+      }
     }
 
     this.mouseDepressed = true;
@@ -160,7 +177,7 @@ export class InteractionService {
     this.selectedMouseInteractable = undefined;
 
     for (let interactable of this.mouseInteractables) {
-      interactable.onMouseUp(event);
+      interactable.onMouseUp(event, undefined);
     }
 
     this.mouseDepressed = false;
@@ -174,7 +191,10 @@ export class InteractionService {
     if (!this.selectedMouseInteractable) {
       this.cameraService.onMouseMove(event);
     } else {
-      this.selectedMouseInteractable.onMouseMove(event);
+      this.selectedMouseInteractable.interactable.onMouseMove(
+        event,
+        this.selectedMouseInteractable.intersection
+      );
     }
 
     if (this.mouseDepressed) {
@@ -183,13 +203,13 @@ export class InteractionService {
 
     const sceneObject = this.getSceneIntersections(event);
 
-    if (sceneObject && this.isStickObject(sceneObject)) {
-      this.toStickObject(sceneObject).showMouseControls();
+    if (sceneObject && this.isStickObject(sceneObject.interactable)) {
+      this.toStickObject(sceneObject.interactable).showMouseControls();
     }
 
     for (let object of this.objectTrackerService.getObjects()) {
       if (this.isStickObject(object)) {
-        if (object.id !== sceneObject?.id) {
+        if (object.id !== sceneObject?.interactable.id) {
           this.toStickObject(object).hideMouseControls();
         }
       }
@@ -222,7 +242,7 @@ export class InteractionService {
     }
 
     for (let interactable of this.mouseInteractables) {
-      interactable.onWheel(event);
+      interactable.onWheel(event, undefined);
     }
   }
 }
