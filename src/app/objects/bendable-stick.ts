@@ -1,4 +1,3 @@
-import { Guid } from 'guid-typescript';
 import * as THREE from 'three';
 import {
   calculateArcAngle,
@@ -8,7 +7,8 @@ import { addWireframe, generateSphere } from '../helpers/object-helpers';
 import { ISceneObject } from '../interfaces/scene-object';
 
 export class BendableStick implements ISceneObject {
-  id: Guid = Guid.create();
+  id: string;
+  meshIds: string[] = [];
   group: THREE.Group;
   existsInScene: boolean = false;
 
@@ -20,6 +20,7 @@ export class BendableStick implements ISceneObject {
     private readonly material: THREE.Material
   ) {
     this.group = new THREE.Group();
+    this.id = this.group.uuid;
 
     const startPosition = new THREE.Vector3();
     const endPosition = new THREE.Vector3(0, this.stickLength, 0);

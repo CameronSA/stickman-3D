@@ -1,4 +1,3 @@
-import { Guid } from 'guid-typescript';
 import * as THREE from 'three';
 import { computeMidpoint } from '../helpers/geometry-helpers';
 import { addWireframe, generateSphere } from '../helpers/object-helpers';
@@ -7,7 +6,8 @@ import { ISceneObject } from '../interfaces/scene-object';
 import { IStickObject } from '../interfaces/stick-object';
 
 export class Stick implements ISceneObject, IStickObject, IMouseInteractable {
-  id: Guid = Guid.create();
+  id: string;
+  meshIds: string[] = [];
   group: THREE.Group;
   existsInScene: boolean = false;
   private readonly stickLength: number = 0;
@@ -19,6 +19,7 @@ export class Stick implements ISceneObject, IStickObject, IMouseInteractable {
     readonly endPosition: THREE.Vector3
   ) {
     this.group = new THREE.Group();
+    this.id = this.group.uuid;
 
     this.stickLength = this.startPosition.distanceTo(this.endPosition);
 
@@ -40,6 +41,8 @@ export class Stick implements ISceneObject, IStickObject, IMouseInteractable {
     addWireframe(body);
     addWireframe(topCap);
     addWireframe(bottomCap);
+
+    this.meshIds.push(body.uuid, topCap.uuid, bottomCap.uuid);
 
     this.group.add(body);
     this.group.add(topCap);

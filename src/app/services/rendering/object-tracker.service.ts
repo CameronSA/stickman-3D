@@ -13,7 +13,7 @@ export class ObjectTrackerService {
 
   public deleteObject(sceneObject: ISceneObject): void {
     for (let i = this.sceneObjects.length - 1; i >= 0; i--) {
-      if (this.sceneObjects[i].id.equals(sceneObject.id)) {
+      if (this.sceneObjects[i].id === sceneObject.id) {
         this.sceneObjects[i].group.remove();
         this.sceneObjects.splice(i, 1);
       }

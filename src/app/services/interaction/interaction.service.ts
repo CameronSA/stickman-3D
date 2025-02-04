@@ -74,7 +74,7 @@ export class InteractionService {
     return new THREE.Vector2(normalizedPosX, normalizedPosY);
   }
 
-  private getSceneIntersections(event: MouseEvent) {
+  private getSceneIntersections(event: MouseEvent): ISceneObject | undefined {
     this.raycaster.setFromCamera(
       this.mousePositionToThreeSpace(event.clientX, event.clientY),
       this.cameraService.getCamera()
@@ -90,17 +90,29 @@ export class InteractionService {
 
     const intersects = this.raycaster.intersectObjects(interactableObjects);
 
-    for (let i = 0; i < intersects.length; i++) {
-      (intersects[i].object as THREE.Mesh).material =
-        new THREE.MeshBasicMaterial({
-          color: new THREE.Color(0xff0000).multiplyScalar(0.5),
-        });
+    if (intersects.length < 0) {
+      return undefined;
     }
 
-    if (intersects.length > 0) {
-      console.log(interactableObjects);
-      console.log(intersects);
+    for (let intersection of intersects) {
+      if (!intersection.object.parent) {
+        continue;
+      }
+
+      try {
+        const targetId = intersection.object.parent?.uuid;
+
+        for (let sceneObject of sceneObjects) {
+          if (sceneObject.meshIds.includes(targetId)) {
+            return sceneObject;
+          }
+        }
+      } catch {
+        continue;
+      }
     }
+
+    return undefined;
   }
 
   private isMouseInteractable(object: ISceneObject): boolean {
@@ -133,7 +145,8 @@ export class InteractionService {
       return;
     }
 
-    const sceneIntersections = this.getSceneIntersections(event);
+    const sceneObject = this.getSceneIntersections(event);
+    console.log(sceneObject);
 
     for (let interactable of this.mouseInteractables) {
       interactable.onMouseMove(event);

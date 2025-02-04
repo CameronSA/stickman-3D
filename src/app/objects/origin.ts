@@ -1,15 +1,16 @@
-import { Guid } from 'guid-typescript';
 import * as THREE from 'three';
 import { getSphericalCoordinate } from '../helpers/coordinate-helpers';
 import { ISceneObject } from '../interfaces/scene-object';
 
 export class Origin implements ISceneObject {
-  id: Guid = Guid.create();
+  id: string;
+  meshIds: string[] = [];
   group: THREE.Group;
   existsInScene: boolean = false;
 
   constructor() {
     this.group = new THREE.Group();
+    this.id = this.group.uuid;
 
     const origin = new THREE.Vector3();
     const xDir = new THREE.Vector3(5, 0, 0);

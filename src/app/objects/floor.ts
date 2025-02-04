@@ -1,15 +1,17 @@
-import { Guid } from 'guid-typescript';
 import * as THREE from 'three';
 import { DEFAULTFLOOR, DEFAULTWORLDSIZE } from '../constants';
 import { ISceneObject } from '../interfaces/scene-object';
 
 export class Floor implements ISceneObject {
-  id: Guid = Guid.create();
+  id: string;
+  meshIds: string[] = [];
   group: THREE.Group;
   existsInScene: boolean = false;
 
   constructor() {
     this.group = new THREE.Group();
+    this.id = this.group.uuid;
+
     const geometry = new THREE.PlaneGeometry(
       DEFAULTWORLDSIZE,
       DEFAULTWORLDSIZE

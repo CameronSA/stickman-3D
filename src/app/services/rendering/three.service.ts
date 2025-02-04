@@ -127,7 +127,7 @@ export class ThreeService {
 
   private objectIsTracked(sceneObject: ISceneObject): boolean {
     for (let trackedObject of this.objectTrackerService.getObjects()) {
-      if (trackedObject.id.equals(sceneObject.id)) {
+      if (trackedObject.id === sceneObject.id) {
         return true;
       }
     }
