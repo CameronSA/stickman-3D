@@ -17,6 +17,7 @@ export class Stick implements ISceneObject, IStickObject, IMouseInteractable {
   private initialControlButtonScale: THREE.Vector3;
   private moveButtonSelected = false;
   private rotateButtonSelected = false;
+  private previousMouseEvent: MouseEvent | undefined = undefined;
 
   constructor(
     private readonly stickRadius: number,
@@ -99,6 +100,8 @@ export class Stick implements ISceneObject, IStickObject, IMouseInteractable {
       this.rotateButtonSelected = true;
       this.moveButtonSelected = false;
     }
+
+    this.previousMouseEvent = { ...event };
   }
 
   onMouseUp(
@@ -112,7 +115,9 @@ export class Stick implements ISceneObject, IStickObject, IMouseInteractable {
     event: MouseEvent,
     intersection: THREE.Intersection | undefined
   ): void {
-    throw new Error('Method not implemented.');
+    if (this.moveButtonSelected) {
+      console.log(this.previousMouseEvent, event);
+    }
   }
 
   onWheel(
