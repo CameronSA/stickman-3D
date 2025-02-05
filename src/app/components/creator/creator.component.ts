@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Color, MeshBasicMaterial, Vector3 } from 'three';
 import { Stick } from '../../objects/stick';
+import { InteractionService } from '../../services/interaction/interaction.service';
 import { ThreeService } from '../../services/rendering/three.service';
 
 @Component({
@@ -12,7 +13,10 @@ import { ThreeService } from '../../services/rendering/three.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreatorComponent {
-  constructor(public readonly threeService: ThreeService) {}
+  constructor(
+    private readonly threeService: ThreeService,
+    private readonly interactionService: InteractionService
+  ) {}
 
   onItemClick(cellId: number, event: any) {
     let stickMaterial = new MeshBasicMaterial({
@@ -37,12 +41,13 @@ export class CreatorComponent {
     });
 
     let stick = new Stick(
+      this.interactionService,
       1,
       stickMaterial,
       moveMaterial,
       rotateMaterial,
       new Vector3(0, 5, 0),
-      new Vector3(0, 15, 0)
+      new Vector3(15, 15, 0)
     );
 
     this.threeService.addObjectToScene(stick);

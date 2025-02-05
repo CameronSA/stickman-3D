@@ -13,7 +13,7 @@ import { ObjectTrackerService } from '../rendering/object-tracker.service';
 export class InteractionService {
   private readonly mouseInteractables: IMouseInteractable[] = [];
   private readonly keyboardInteractables: IKeyboardInteractable[] = [];
-  private readonly raycaster = new THREE.Raycaster();
+  public readonly raycaster = new THREE.Raycaster();
   private sceneSize = new THREE.Vector2();
   private sceneOffset = new THREE.Vector2();
   private selectedMouseInteractable:
@@ -69,7 +69,7 @@ export class InteractionService {
     this.interactionEnabled = enabled;
   }
 
-  private mousePositionToThreeSpace(posX: number, posY: number): THREE.Vector2 {
+  mousePositionToThreeSpace(posX: number, posY: number): THREE.Vector2 {
     // calculate pointer position in normalized device coordinates
     // (-1 to +1) for both components
 
@@ -81,17 +81,23 @@ export class InteractionService {
     return new THREE.Vector2(normalizedPosX, normalizedPosY);
   }
 
-  private getSceneIntersections(event: MouseEvent):
+  setRaycasterFromMouse(event: MouseEvent) {
+    this.raycaster.setFromCamera(
+      this.mousePositionToThreeSpace(event.clientX, event.clientY),
+      this.cameraService.getCamera()
+    );
+  }
+
+  getCameraWorldDirection() {
+    return this.cameraService.getCameraWorldDirection();
+  }
+
+  private getSceneIntersections():
     | {
         interactable: IMouseInteractable;
         intersection: THREE.Intersection;
       }
     | undefined {
-    this.raycaster.setFromCamera(
-      this.mousePositionToThreeSpace(event.clientX, event.clientY),
-      this.cameraService.getCamera()
-    );
-
     const sceneObjects = this.objectTrackerService.getObjects();
     const interactableObjects: THREE.Object3D[] = [];
     for (let sceneObject of sceneObjects) {
@@ -153,7 +159,8 @@ export class InteractionService {
       return;
     }
 
-    const sceneObject = this.getSceneIntersections(event);
+    this.setRaycasterFromMouse(event);
+    const sceneObject = this.getSceneIntersections();
     if (sceneObject) {
       this.selectedMouseInteractable = sceneObject;
       this.selectedMouseInteractable.interactable.onMouseDown(
@@ -188,6 +195,8 @@ export class InteractionService {
       return;
     }
 
+    this.setRaycasterFromMouse(event);
+
     if (!this.selectedMouseInteractable) {
       this.cameraService.onMouseMove(event);
     } else {
@@ -201,7 +210,7 @@ export class InteractionService {
       return;
     }
 
-    const sceneObject = this.getSceneIntersections(event);
+    const sceneObject = this.getSceneIntersections();
 
     if (sceneObject && this.isStickObject(sceneObject.interactable)) {
       this.toStickObject(sceneObject.interactable).showMouseControls();
