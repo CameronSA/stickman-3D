@@ -92,6 +92,10 @@ export class InteractionService {
     return this.cameraService.getCameraWorldDirection();
   }
 
+  getCameraWorldPosition() {
+    return this.cameraService.getCameraWorldPosition();
+  }
+
   private getSceneIntersections():
     | {
         interactable: IMouseInteractable;

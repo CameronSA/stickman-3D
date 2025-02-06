@@ -158,6 +158,13 @@ export class CameraService
     return plane;
   }
 
+  getCameraWorldPosition(): THREE.Vector3 {
+    const position = new THREE.Vector3();
+    this.camera.getWorldPosition(position);
+
+    return position;
+  }
+
   rescale(aspectRatio: number) {
     this.camera.aspect = aspectRatio;
     this.camera.updateProjectionMatrix();

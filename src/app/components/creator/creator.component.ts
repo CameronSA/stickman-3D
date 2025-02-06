@@ -46,10 +46,22 @@ export class CreatorComponent {
       stickMaterial,
       moveMaterial,
       rotateMaterial,
-      new Vector3(0, 5, 0),
-      new Vector3(15, 15, 0)
+      new Vector3(0, 3, 0),
+      new Vector3(5, 12, 0)
     );
 
     this.threeService.addObjectToScene(stick);
+
+    // let stick2 = new Stick(
+    //   this.interactionService,
+    //   1,
+    //   stickMaterial,
+    //   moveMaterial,
+    //   rotateMaterial,
+    //   new Vector3(2.5, 7.5, 0),
+    //   new Vector3(0, 15, 20)
+    // );
+
+    // this.threeService.addObjectToScene(stick2);
   }
 }

@@ -4,13 +4,13 @@
 
 ### Object Creation
 
-- Ability to move objects
+- ~~Ability to move objects~~
 
-  - Orange circle in centre (currently at edge, needs moving) on hover
+  - ~~Orange circle in centre (currently at edge, needs moving) on hover~~
 
 - Ability to rotate objects
 
-  - Red circle on edge on hover
+  - ~~Red circle on edge on hover~~
   - Rotate around camera plane normal (similarly to moving objects)
   - **User Toggle**: Option to rotate around centre, edge, or user defined point - show rotation point when rotating
 
