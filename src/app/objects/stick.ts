@@ -19,7 +19,7 @@ export class Stick implements ISceneObject, IStickObject, IMouseInteractable {
   private initialControlButtonScale: THREE.Vector3;
   private moveButtonSelected = false;
   private rotateButtonSelectedIndex = -1;
-  private rotationSetting = RotationSetting.AroundCenter;
+  private rotationSetting = RotationSetting.AroundFarRotationPoint;
 
   private plane = new THREE.Plane();
   private planeIntersect = new THREE.Vector3(); // point of intersection with the plane
@@ -188,6 +188,13 @@ export class Stick implements ISceneObject, IStickObject, IMouseInteractable {
           vectorMoved,
           this.rotateButtonSelectedIndex === 0 ? -1 : 1
         );
+      } else if (
+        this.rotationSetting === RotationSetting.AroundFarRotationPoint
+      ) {
+        this.handleRotationAboutOppositeRotationPoint(
+          vectorMoved,
+          this.rotateButtonSelectedIndex === 0 ? -1 : 1
+        );
       }
     }
   }
@@ -252,6 +259,32 @@ export class Stick implements ISceneObject, IStickObject, IMouseInteractable {
       .sub(this.startPosition)
       .normalize();
 
+    this.group.quaternion.setFromUnitVectors(axisOfRotation, axisOfAlignment);
+  }
+
+  private handleRotationAboutOppositeRotationPoint(
+    vectorMoved: THREE.Vector3,
+    lengthSignMultiplier: number
+  ) {
+    const projectedEndPosition = this.endPosition.clone().add(vectorMoved);
+    const projectedLength =
+      lengthSignMultiplier *
+      this.startPosition.distanceTo(projectedEndPosition);
+    const lengthFraction = this.stickLength / projectedLength;
+
+    this.endPosition = this.startPosition
+      .clone()
+      .add(projectedEndPosition)
+      .multiplyScalar(lengthFraction);
+
+    const axisOfRotation = new THREE.Vector3(0, 1, 0);
+    const axisOfAlignment = this.endPosition
+      .clone()
+      .sub(this.startPosition)
+      .normalize();
+
+    const newPosition = computeMidpoint(this.startPosition, this.endPosition);
+    this.group.position.set(newPosition.x, newPosition.y, newPosition.z);
     this.group.quaternion.setFromUnitVectors(axisOfRotation, axisOfAlignment);
   }
 
