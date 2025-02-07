@@ -14,6 +14,15 @@
   - Rotate around camera plane normal (similarly to moving objects)
   - **User Toggle**: Option to rotate around centre, edge, or user defined point - show rotation point when rotating
 
+- Introduce **Dev Tools**
+
+  - New component on the side bar
+  - Rotation has become a massive pain because it is difficult to visualise. So it would be useful to have some dev tools to aid development:
+    - Visible plane that cuts through a defined object (I.e. an object being rotated around) where the normal is the direction of the camera
+      - Could define a new 2D coordinate system based off the plane, where the origin is the defined object. For translations and rotations, we can then just move things in this coordinate system
+      - For rotations, the mouse position on the plane would be equivalent to the vector to align an object to
+    - Move the existing grid and origin objects to the dev tools
+
 - Ability to snap objects together
 
   - Green circle on snap point
