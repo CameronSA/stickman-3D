@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import * as THREE from 'three';
-import { IKeyboardInteractable } from '../../interfaces/keyboard-interactable';
 import { IMouseInteractable } from '../../interfaces/mouse-interactable';
 import { ISceneObject } from '../../interfaces/scene-object';
 import { IStickObject } from '../../interfaces/stick-object';
@@ -11,8 +10,6 @@ import { ObjectTrackerService } from '../rendering/object-tracker.service';
   providedIn: 'root',
 })
 export class InteractionService {
-  private readonly mouseInteractables: IMouseInteractable[] = [];
-  private readonly keyboardInteractables: IKeyboardInteractable[] = [];
   public readonly raycaster = new THREE.Raycaster();
   private sceneSize = new THREE.Vector2();
   private sceneOffset = new THREE.Vector2();
@@ -48,21 +45,6 @@ export class InteractionService {
     );
 
     this.sceneOffset = new THREE.Vector2(element.offsetLeft, element.offsetTop);
-  }
-
-  addMouseInteractable(interactable: IMouseInteractable): void {
-    this.mouseInteractables.push(interactable);
-  }
-
-  addKeyboardInteractable(interactable: IKeyboardInteractable): void {
-    this.keyboardInteractables.push(interactable);
-  }
-
-  addInteractable<
-    TInteractable extends IMouseInteractable & IKeyboardInteractable
-  >(interactable: TInteractable): void {
-    this.mouseInteractables.push(interactable as IMouseInteractable);
-    this.keyboardInteractables.push(interactable as IKeyboardInteractable);
   }
 
   toggleInteractions(enabled: boolean): void {
@@ -172,9 +154,7 @@ export class InteractionService {
         sceneObject.intersection
       );
     } else {
-      for (let interactable of this.mouseInteractables) {
-        interactable.onMouseDown(event, undefined);
-      }
+      this.cameraService.onMouseDown(event);
     }
 
     this.mouseDepressed = true;
@@ -187,9 +167,7 @@ export class InteractionService {
 
     this.selectedMouseInteractable = undefined;
 
-    for (let interactable of this.mouseInteractables) {
-      interactable.onMouseUp(event, undefined);
-    }
+    this.cameraService.onMouseUp(event);
 
     this.mouseDepressed = false;
   }
@@ -233,29 +211,17 @@ export class InteractionService {
     if (!this.interactionEnabled) {
       return;
     }
-
-    for (let interactable of this.keyboardInteractables) {
-      interactable.onKeyDown(event);
-    }
   }
 
   private onKeyUp(event: KeyboardEvent): void {
     if (!this.interactionEnabled) {
       return;
     }
-
-    for (let interactable of this.keyboardInteractables) {
-      interactable.onKeyUp(event);
-    }
   }
 
   private onWheel(event: WheelEvent): void {
     if (!this.interactionEnabled) {
       return;
-    }
-
-    for (let interactable of this.mouseInteractables) {
-      interactable.onWheel(event, undefined);
     }
   }
 }

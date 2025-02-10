@@ -28,7 +28,6 @@ export class ThreeService {
   createThreeJsBox(containerElementId: string): void {
     this.container = document.getElementById(containerElementId) as HTMLElement;
     this.interactionService.setSceneSize(this.container);
-    this.interactionService.addInteractable(this.cameraService);
     this.renderer.setSize(
       this.container.offsetWidth,
       this.container.offsetHeight
