@@ -21,13 +21,9 @@ export class Stick implements ISceneObject, IStickObject, IMouseInteractable {
   private rotateButtonSelectedIndex = -1;
   private rotationSetting = RotationSetting.AroundFarRotationPoint;
 
-  private plane = new THREE.Plane();
-  private planeIntersect = new THREE.Vector3(); // point of intersection with the plane
-  private pIntersect = new THREE.Vector3(); // point of intersection with an object (plane's point)
-  private shift = new THREE.Vector3(); // distance between position of an object and points of intersection with the object
-  private initialClickToCentre = new THREE.Vector3();
+  private workingPlane = new THREE.Plane();
   private initialClickPosition = new THREE.Vector3();
-  private cameraDirection = new THREE.Vector3();
+  private initialCentrePosition = new THREE.Vector3();
 
   constructor(
     private readonly interactionService: InteractionService,
@@ -146,16 +142,15 @@ export class Stick implements ISceneObject, IStickObject, IMouseInteractable {
       return;
     }
 
-    this.cameraDirection = this.interactionService.getCameraWorldDirection();
+    const cameraDirection = this.interactionService.getCameraWorldDirection();
 
-    // this.axisOfRotation = this.calculateAxisOfRotation();
-
-    this.pIntersect.copy(intersection.point);
-    this.plane.setFromNormalAndCoplanarPoint(
-      this.cameraDirection,
-      this.pIntersect
+    this.workingPlane.setFromNormalAndCoplanarPoint(
+      cameraDirection,
+      intersection.point
     );
-    this.shift.subVectors(intersection.object.position, intersection.point);
+
+    this.initialCentrePosition = this.group.position.clone();
+    this.initialClickPosition = intersection.point.clone();
 
     const intersectionUuid = intersection?.object.uuid;
 
@@ -173,11 +168,6 @@ export class Stick implements ISceneObject, IStickObject, IMouseInteractable {
 
       this.moveButtonSelected = false;
     }
-
-    this.initialClickPosition = this.calculateIntersectingPosition();
-    this.initialClickToCentre = this.initialClickPosition
-      .clone()
-      .sub(this.group.position);
   }
 
   onMouseUp(
@@ -192,9 +182,21 @@ export class Stick implements ISceneObject, IStickObject, IMouseInteractable {
     event: MouseEvent,
     intersection: THREE.Intersection | undefined
   ): void {
-    const newPosition = this.calculateIntersectingPosition();
-    const offsetPosition = newPosition.sub(this.initialClickToCentre);
+    const planeIntersect = this.interactionService.raycaster.ray.intersectPlane(
+      this.workingPlane,
+      new THREE.Vector3()
+    );
+
+    if (!planeIntersect) {
+      return;
+    }
+
+    const initialClickToCentre = this.initialClickPosition
+      .clone()
+      .sub(this.initialCentrePosition);
+    const offsetPosition = planeIntersect.sub(initialClickToCentre);
     const vectorMoved = offsetPosition.clone().sub(this.group.position);
+
     if (this.moveButtonSelected) {
       this.startPosition.add(vectorMoved);
       this.endPosition.add(vectorMoved);
@@ -204,20 +206,6 @@ export class Stick implements ISceneObject, IStickObject, IMouseInteractable {
         offsetPosition.y,
         offsetPosition.z
       );
-    } else if (this.rotateButtonSelectedIndex > -1) {
-      if (this.rotationSetting === RotationSetting.AroundCenter) {
-        this.handleRotationAboutCentre(
-          vectorMoved,
-          this.rotateButtonSelectedIndex === 0 ? -1 : 1
-        );
-      } else if (
-        this.rotationSetting === RotationSetting.AroundFarRotationPoint
-      ) {
-        this.handleRotationAboutOppositeRotationPoint(
-          vectorMoved,
-          this.rotateButtonSelectedIndex === 0 ? -1 : 1
-        );
-      }
     }
   }
 
@@ -308,20 +296,6 @@ export class Stick implements ISceneObject, IStickObject, IMouseInteractable {
     const newPosition = computeMidpoint(this.startPosition, this.endPosition);
     this.group.position.set(newPosition.x, newPosition.y, newPosition.z);
     this.group.quaternion.setFromUnitVectors(axisOfRotation, axisOfAlignment);
-  }
-
-  private calculateIntersectingPosition(): THREE.Vector3 {
-    this.interactionService.raycaster.ray.intersectPlane(
-      this.plane,
-      this.planeIntersect
-    );
-
-    const newPosition = new THREE.Vector3().addVectors(
-      this.planeIntersect,
-      this.shift
-    );
-
-    return newPosition;
   }
 
   private updateButtonScale(scale: THREE.Vector3) {
