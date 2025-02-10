@@ -187,7 +187,7 @@ export class InteractionService {
         const devTools = this.getDevTools();
         const stick = this.toStickObject(sceneObject.interactable);
         for (const devTool of devTools) {
-          devTool.updatePostion(stick.startPosition);
+          devTool.updatePostion(stick.getCurrentCenterPosition());
         }
       }
     } else {

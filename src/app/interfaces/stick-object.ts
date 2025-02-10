@@ -7,4 +7,5 @@ export interface IStickObject {
   showMouseControls(): void;
   hideMouseControls(): void;
   setRotationSetting(rotationSetting: RotationSetting): void;
+  getCurrentCenterPosition(): THREE.Vector3;
 }

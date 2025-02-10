@@ -116,6 +116,28 @@ export class Stick implements ISceneObject, IStickObject, IMouseInteractable {
     this.rotationSetting = rotationSetting;
   }
 
+  getCurrentCenterPosition(): THREE.Vector3 {
+    if (
+      this.moveButtonSelected ||
+      this.rotationSetting === RotationSetting.AroundCenter
+    ) {
+      return this.group.position;
+    }
+
+    if (
+      this.rotationSetting === RotationSetting.AroundFarRotationPoint &&
+      this.rotateButtonSelectedIndex > -1
+    ) {
+      if (this.rotateButtonSelectedIndex === 0) {
+        return this.endPosition;
+      }
+
+      return this.startPosition;
+    }
+
+    return new THREE.Vector3();
+  }
+
   onMouseDown(
     event: MouseEvent,
     intersection: THREE.Intersection | undefined
