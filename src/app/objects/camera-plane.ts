@@ -27,7 +27,7 @@ export class CameraPlane implements ISceneObject, IDevTool {
   }
 
   update() {
-    const cameraDirection = this.interactionService.getCameraWorldDirection();
-    this.group.lookAt(cameraDirection);
+    const cameraQuarternion = this.interactionService.getCameraQuarternion();
+    this.group.quaternion.copy(cameraQuarternion);
   }
 }

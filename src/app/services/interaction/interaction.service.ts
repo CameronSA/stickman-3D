@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as THREE from 'three';
+import { IDevTool } from '../../interfaces/dev-tools';
 import { IMouseInteractable } from '../../interfaces/mouse-interactable';
 import { ISceneObject } from '../../interfaces/scene-object';
 import { IStickObject } from '../../interfaces/stick-object';
@@ -21,6 +22,7 @@ export class InteractionService {
     | undefined = undefined;
   private mouseDepressed: boolean = false;
   private interactionEnabled: boolean = true;
+  private devToolsEnabled: boolean = true;
 
   constructor(
     private readonly cameraService: CameraService,
@@ -76,6 +78,10 @@ export class InteractionService {
 
   getCameraWorldPosition() {
     return this.cameraService.getCameraWorldPosition();
+  }
+
+  getCameraQuarternion() {
+    return this.cameraService.getCameraQuarternion();
   }
 
   private getSceneIntersections():
@@ -140,6 +146,26 @@ export class InteractionService {
     return object as unknown as IStickObject;
   }
 
+  private isDevTool(object: ISceneObject): boolean {
+    return 'updatePostion' in object;
+  }
+
+  private toDevTool(object: ISceneObject): IDevTool {
+    return object as unknown as IDevTool;
+  }
+
+  private getDevTools(): IDevTool[] {
+    const sceneObjects = this.objectTrackerService.getObjects();
+    const devTools: IDevTool[] = [];
+    for (const sceneObject of sceneObjects) {
+      if (this.isDevTool(sceneObject)) {
+        devTools.push(this.toDevTool(sceneObject));
+      }
+    }
+
+    return devTools;
+  }
+
   private onMouseDown(event: MouseEvent): void {
     if (!this.interactionEnabled) {
       return;
@@ -153,6 +179,17 @@ export class InteractionService {
         event,
         sceneObject.intersection
       );
+
+      if (
+        this.devToolsEnabled &&
+        this.isStickObject(sceneObject.interactable)
+      ) {
+        const devTools = this.getDevTools();
+        const stick = this.toStickObject(sceneObject.interactable);
+        for (const devTool of devTools) {
+          devTool.updatePostion(stick.startPosition);
+        }
+      }
     } else {
       this.cameraService.onMouseDown(event);
     }

@@ -165,6 +165,10 @@ export class CameraService
     return position;
   }
 
+  getCameraQuarternion(): THREE.Quaternion {
+    return this.camera.quaternion;
+  }
+
   rescale(aspectRatio: number) {
     this.camera.aspect = aspectRatio;
     this.camera.updateProjectionMatrix();
