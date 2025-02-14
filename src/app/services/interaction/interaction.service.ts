@@ -260,5 +260,7 @@ export class InteractionService {
     if (!this.interactionEnabled) {
       return;
     }
+
+    this.cameraService.onWheel(event);
   }
 }
